@@ -1,0 +1,14 @@
+{{ define "main" }}
+  <header class="page-header">
+    <h1>{{ .Title }}</h1>
+  </header>
+
+  <section class="term-grid" aria-label="{{ .Title }}">
+    {{ range .Data.Terms.Alphabetical }}
+      <a class="term-card" href="{{ .Page.RelPermalink }}">
+        <span>{{ .Page.LinkTitle }}</span>
+        <strong>{{ .Count }}</strong>
+      </a>
+    {{ end }}
+  </section>
+{{ end }}

@@ -1,0 +1,30 @@
+<div class="article-meta">
+  {{ with .Date }}
+    <time datetime="{{ .Format "2006-01-02" }}">{{ .Format (site.Params.dateFormat | default "2006-01-02") }}</time>
+  {{ end }}
+  {{ if and site.Params.showReadingTime .ReadingTime }}
+    <span aria-hidden="true">/</span>
+    <span>{{ i18n "readingTime" .ReadingTime }}</span>
+  {{ end }}
+  {{ if and .Lastmod (gt .Lastmod .Date) }}
+    <span aria-hidden="true">/</span>
+    <span>{{ i18n "updated" }} {{ .Lastmod.Format (site.Params.dateFormat | default "2006-01-02") }}</span>
+  {{ end }}
+</div>
+
+<div class="taxonomy-row">
+  {{ with .GetTerms "categories" }}
+    <ul class="tag-list" aria-label="{{ i18n "categories" }}">
+      {{ range . }}
+        <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
+      {{ end }}
+    </ul>
+  {{ end }}
+  {{ with .GetTerms "tags" }}
+    <ul class="tag-list" aria-label="{{ i18n "tags" }}">
+      {{ range . }}
+        <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
+      {{ end }}
+    </ul>
+  {{ end }}
+</div>

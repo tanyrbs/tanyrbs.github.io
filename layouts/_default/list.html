@@ -1,0 +1,19 @@
+{{ define "main" }}
+  <header class="page-header">
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p>{{ . }}</p>{{ end }}
+  </header>
+
+  <section class="post-list" aria-label="{{ .Title }}">
+    {{ range .Pages.ByDate.Reverse }}
+      <article class="post-card">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.dateFormat | default "2006-01-02") }}</time>
+        <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+        <p>{{ .Summary | plainify }}</p>
+        {{ partial "post-meta.html" . }}
+      </article>
+    {{ else }}
+      <p class="empty-state">{{ i18n "noPosts" }}</p>
+    {{ end }}
+  </section>
+{{ end }}

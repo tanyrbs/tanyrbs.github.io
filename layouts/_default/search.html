@@ -1,0 +1,15 @@
+{{ define "main" }}
+  <article class="article search-page" data-pagefind-ignore>
+    <header class="article-header">
+      <h1>{{ .Title }}</h1>
+      {{ with .Description }}<p>{{ . }}</p>{{ end }}
+    </header>
+    <div class="search-box">
+      <pagefind-input placeholder="{{ i18n "searchPlaceholder" }}"></pagefind-input>
+      <pagefind-summary></pagefind-summary>
+      <pagefind-results show-sub-results></pagefind-results>
+    </div>
+  </article>
+  <link href="{{ "pagefind/pagefind-component-ui.css" | relURL }}" rel="stylesheet">
+  <script src="{{ "pagefind/pagefind-component-ui.js" | relURL }}" type="module"></script>
+{{ end }}

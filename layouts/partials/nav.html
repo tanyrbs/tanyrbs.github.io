@@ -1,0 +1,18 @@
+<nav class="site-nav" aria-label="Site navigation">
+  <a href="{{ site.Home.RelPermalink }}"{{ if .IsHome }} aria-current="page"{{ end }}>{{ i18n "home" }}</a>
+  {{ with site.GetPage "section" "blog" }}
+    <a href="{{ .RelPermalink }}"{{ if eq $.Section "blog" }} aria-current="page"{{ end }}>{{ i18n "blog" }}</a>
+  {{ end }}
+  {{ with site.GetPage "page" "about" }}
+    <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "about" }}</a>
+  {{ end }}
+  {{ with site.GetPage "page" "search" }}
+    <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "search" }}</a>
+  {{ end }}
+  <a href="{{ site.Params.github }}" rel="me">{{ i18n "github" }}</a>
+  <span class="language-switcher" aria-label="{{ i18n "language" }}">
+    {{ range .AllTranslations }}
+      <a href="{{ .RelPermalink }}"{{ if eq .Language.Lang $.Language.Lang }} aria-current="page"{{ end }}>{{ .Language.Label }}</a>
+    {{ end }}
+  </span>
+</nav>

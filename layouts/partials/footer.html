@@ -1,0 +1,8 @@
+<footer class="site-footer">
+  <span>{{ site.Copyright }}</span>
+  {{ with .OutputFormats.Get "RSS" }}
+    <a href="{{ .RelPermalink }}">{{ i18n "rss" }}</a>
+  {{ else }}
+    <a href="{{ site.Home.RelPermalink }}index.xml">{{ i18n "rss" }}</a>
+  {{ end }}
+</footer>

@@ -1,0 +1,38 @@
+{{ define "main" }}
+  <section class="profile" aria-label="Profile">
+    <img class="avatar" src="{{ site.Params.avatar | relURL }}" width="300" height="273" alt="{{ site.Params.author }}">
+    <div>
+      <h1>{{ site.Params.author }}</h1>
+      <p class="affiliation">{{ site.Params.affiliation }}</p>
+      <dl class="profile-list">
+        <dt>{{ i18n "email" }}</dt>
+        <dd><a href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a></dd>
+        <dt>{{ i18n "school" }}</dt>
+        <dd>{{ site.Params.affiliation }}</dd>
+        <dt>{{ i18n "github" }}</dt>
+        <dd><a href="{{ site.Params.github }}" rel="me">github.com/tanyrbs</a></dd>
+      </dl>
+    </div>
+  </section>
+
+  {{ $posts := where site.RegularPages "Section" "blog" }}
+  <section class="content-section" aria-labelledby="recent-posts">
+    <div class="section-heading">
+      <h2 id="recent-posts">{{ i18n "recentPosts" }}</h2>
+      {{ with site.GetPage "section" "blog" }}
+        <a class="section-link" href="{{ .RelPermalink }}">{{ i18n "allPosts" }}</a>
+      {{ end }}
+    </div>
+    <div class="post-list">
+      {{ range first 3 ($posts.ByDate.Reverse) }}
+        <article class="post-card">
+          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.dateFormat | default "2006-01-02") }}</time>
+          <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+          <p>{{ .Summary | plainify }}</p>
+        </article>
+      {{ else }}
+        <p class="empty-state">{{ i18n "noPosts" }}</p>
+      {{ end }}
+    </div>
+  </section>
+{{ end }}

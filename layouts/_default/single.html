@@ -1,0 +1,22 @@
+{{ define "main" }}
+  <article class="article">
+    <header class="article-header">
+      <h1>{{ .Title }}</h1>
+      {{ if eq .Section "blog" }}
+        {{ partial "post-meta.html" . }}
+      {{ end }}
+    </header>
+    {{ if and site.Params.showToc .TableOfContents (eq .Section "blog") }}
+      <aside class="toc" aria-labelledby="toc-title">
+        <h2 id="toc-title">{{ i18n "tableOfContents" }}</h2>
+        {{ .TableOfContents }}
+      </aside>
+    {{ end }}
+    <div class="article-content" data-pagefind-body>
+      {{ .Content }}
+    </div>
+    {{ if eq .Section "blog" }}
+      {{ partial "comments.html" . }}
+    {{ end }}
+  </article>
+{{ end }}

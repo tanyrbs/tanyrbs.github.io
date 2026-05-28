@@ -1,0 +1,100 @@
+baseURL = "https://tanyrbs.github.io/"
+locale = "en-US"
+title = "Haotao TAN"
+copyright = "(c) 2026 Haotao TAN"
+enableRobotsTXT = true
+timeZone = "Asia/Shanghai"
+summaryLength = 28
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = false
+
+[params]
+  description = "Haotao TAN, East China University of Science and Technology"
+  author = "Haotao TAN"
+  affiliation = "East China University of Science and Technology"
+  email = "19003279@mail.ecust.edu.cn"
+  github = "https://github.com/tanyrbs"
+  avatar = "/img/avatar_hu11966206482947421333.JPG"
+  images = ["/img/avatar_hu11966206482947421333.JPG"]
+  mainSections = ["blog"]
+  dateFormat = "2006-01-02"
+  showReadingTime = true
+  showToc = true
+
+  [params.giscus]
+    enabled = false
+    repo = "tanyrbs/tanyrbs.github.io"
+    repoId = ""
+    category = "Announcements"
+    categoryId = ""
+    mapping = "pathname"
+    reactionsEnabled = "1"
+    emitMetadata = "0"
+    inputPosition = "bottom"
+    theme = "preferred_color_scheme"
+    lang = "en"
+
+[languages]
+  [languages.en]
+    contentDir = "content/en"
+    label = "English"
+    weight = 1
+    title = "Haotao TAN"
+    locale = "en-US"
+    [languages.en.params]
+      description = "Haotao TAN, East China University of Science and Technology"
+      author = "Haotao TAN"
+      affiliation = "East China University of Science and Technology"
+      email = "19003279@mail.ecust.edu.cn"
+      github = "https://github.com/tanyrbs"
+      avatar = "/img/avatar_hu11966206482947421333.JPG"
+      dateFormat = "2006-01-02"
+      giscusLang = "en"
+
+  [languages.zh-cn]
+    contentDir = "content/zh-cn"
+    label = "中文"
+    weight = 2
+    title = "谭昊涛"
+    locale = "zh-CN"
+    [languages.zh-cn.params]
+      description = "谭昊涛，华东理工大学"
+      author = "谭昊涛"
+      affiliation = "华东理工大学"
+      email = "19003279@mail.ecust.edu.cn"
+      github = "https://github.com/tanyrbs"
+      avatar = "/img/avatar_hu11966206482947421333.JPG"
+      dateFormat = "2006-01-02"
+      giscusLang = "zh-CN"
+
+[permalinks]
+  [permalinks.page]
+    blog = "/blog/:year/:month/:slug/"
+  [permalinks.section]
+    blog = "/blog/"
+
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]
+  taxonomy = ["HTML", "RSS"]
+  term = ["HTML", "RSS"]
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    noClasses = true
+    style = "github"
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 3
+    ordered = false

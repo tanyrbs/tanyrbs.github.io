@@ -1,0 +1,56 @@
+[home]
+other = "Home"
+
+[blog]
+other = "Blog"
+
+[about]
+other = "About"
+
+[search]
+other = "Search"
+
+[github]
+other = "GitHub"
+
+[email]
+other = "Email"
+
+[school]
+other = "School"
+
+[recentPosts]
+other = "Recent Posts"
+
+[allPosts]
+other = "All posts"
+
+[noPosts]
+other = "No posts yet."
+
+[tags]
+other = "Tags"
+
+[categories]
+other = "Categories"
+
+[readingTime]
+other = "{{ .Count }} min read"
+
+[updated]
+other = "Updated"
+
+[tableOfContents]
+other = "Contents"
+
+[comments]
+other = "Comments"
+
+[searchPlaceholder]
+other = "Search posts and pages"
+
+[language]
+other = "Language"
+
+[rss]
+other = "RSS"

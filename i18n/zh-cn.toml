@@ -1,0 +1,56 @@
+[home]
+other = "首页"
+
+[blog]
+other = "博客"
+
+[about]
+other = "关于"
+
+[search]
+other = "搜索"
+
+[github]
+other = "GitHub"
+
+[email]
+other = "邮箱"
+
+[school]
+other = "学校"
+
+[recentPosts]
+other = "最新文章"
+
+[allPosts]
+other = "全部文章"
+
+[noPosts]
+other = "暂无文章。"
+
+[tags]
+other = "标签"
+
+[categories]
+other = "分类"
+
+[readingTime]
+other = "{{ .Count }} 分钟阅读"
+
+[updated]
+other = "更新"
+
+[tableOfContents]
+other = "目录"
+
+[comments]
+other = "评论"
+
+[searchPlaceholder]
+other = "搜索文章和页面"
+
+[language]
+other = "语言"
+
+[rss]
+other = "RSS"
