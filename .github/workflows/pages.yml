@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       HUGO_VERSION: 0.162.0
-      HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
+      HUGO_CACHEDIR: /tmp/hugo_cache
       TZ: Asia/Shanghai
     steps:
       - name: Checkout
