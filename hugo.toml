@@ -55,11 +55,11 @@ defaultContentLanguageInSubdir = false
     contentDir = "content/zh-cn"
     label = "中文"
     weight = 2
-    title = "谭昊涛"
+    title = "谭浩陶"
     locale = "zh-CN"
     [languages.zh-cn.params]
-      description = "谭昊涛，华东理工大学"
-      author = "谭昊涛"
+      description = "谭浩陶，华东理工大学"
+      author = "谭浩陶"
       affiliation = "华东理工大学"
       email = "19003279@mail.ecust.edu.cn"
       github = "https://github.com/tanyrbs"
