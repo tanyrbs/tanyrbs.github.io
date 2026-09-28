@@ -284,6 +284,17 @@ h3 {
   color: var(--text);
 }
 
+.article-content .math-block {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1.25em 0;
+  padding: 0.25em 0;
+}
+
+.article-content .math-block math {
+  min-width: max-content;
+}
+
 .article-content table {
   width: 100%;
   border-collapse: collapse;

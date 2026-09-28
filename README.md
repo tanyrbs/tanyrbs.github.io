@@ -24,6 +24,8 @@ Post content goes here.
 
 To link translations, give matching posts the same `translationKey`.
 
+Mathematical expressions can use `$...$` inline or `$$...$$` on separate lines for display equations. Hugo renders them to native MathML during the build, without a client-side script or external stylesheet. Use standard LaTeX math commands rather than document-specific macros.
+
 ## Local preview
 
 Install Hugo Extended, then run:
