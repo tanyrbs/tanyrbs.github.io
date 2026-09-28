@@ -1,0 +1,9 @@
+{{- $kind := .Get "kind" | default "analysis" -}}
+{{- $title := .Get "title" -}}
+{{- if not (in (slice "summary" "definition" "analysis" "remark") $kind) -}}
+  {{- errorf "Unknown lecture box kind %q at %s" $kind .Position -}}
+{{- end -}}
+<aside class="lecture-box lecture-box--{{ $kind }}" aria-label="{{ $title }}">
+  <div class="lecture-box__title">{{ $title }}</div>
+  <div class="lecture-box__body">{{ .Page.RenderString (dict "display" "block") .Inner }}</div>
+</aside>

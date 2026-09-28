@@ -1,0 +1,213 @@
+/* Web adaptation of the CN Lecture Note template: white paper, blue headings,
+   an orange banner accent, and distinct summary/definition/analysis/remark boxes. */
+.lecture-article {
+  --lecture-brand: #2f54eb;
+  --lecture-heading: #1f3c88;
+  --lecture-accent: #ffb84d;
+  --lecture-remark: #a85400;
+  --lecture-definition: #178a69;
+  background: #fff;
+  border-color: #e0e6f0;
+  box-shadow: 0 12px 36px rgb(31 60 136 / 5%);
+}
+
+.lecture-banner {
+  margin-bottom: 22px;
+  padding: 24px 28px;
+  border: 1px solid #b8c8f8;
+  border-left: 5px solid var(--lecture-accent);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.lecture-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.lecture-banner h1 {
+  margin: 0 0 12px;
+  color: var(--lecture-heading);
+  font-family: "Times New Roman", "Noto Serif CJK SC", "Songti SC", SimSun, serif;
+  font-size: clamp(28px, 4vw, 38px);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.lecture-subtitle {
+  margin: 0 0 20px;
+  color: var(--lecture-brand);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.lecture-banner .article-meta {
+  font-size: 13px;
+}
+
+.lecture-toc {
+  padding: 12px 18px;
+  background: #fff;
+  border-color: #dce4f3;
+}
+
+.lecture-toc summary {
+  cursor: pointer;
+  color: var(--lecture-heading);
+  font-weight: 600;
+}
+
+.lecture-toc[open] summary {
+  margin-bottom: 12px;
+}
+
+.lecture-content {
+  max-width: none;
+  color: #1a1a1a;
+  font-family: "Times New Roman", "Noto Serif CJK SC", "Songti SC", SimSun, serif;
+  font-size: 18px;
+  line-height: 1.85;
+}
+
+.lecture-content h2 {
+  margin: 36px 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #dce4f3;
+  color: var(--lecture-heading);
+  font-size: 25px;
+  line-height: 1.5;
+}
+
+.lecture-content h3 {
+  margin: 26px 0 12px;
+  color: var(--lecture-brand);
+  font-size: 21px;
+  line-height: 1.5;
+}
+
+.lecture-content p {
+  margin: 0 0 1em;
+}
+
+.lecture-content li + li {
+  margin-top: 0.35em;
+}
+
+.lecture-box {
+  --box-color: var(--lecture-brand);
+  margin: 24px 0;
+  overflow: hidden;
+  border: 1px solid #dce4f3;
+  border-left: 4px solid var(--box-color);
+  border-radius: 5px;
+  background: #fff;
+}
+
+.lecture-box__title {
+  padding: 12px 18px 0;
+  color: var(--box-color);
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.lecture-box__body {
+  padding: 8px 18px 16px;
+}
+
+.lecture-box__body > :last-child {
+  margin-bottom: 0;
+}
+
+.lecture-box__body > :first-child {
+  margin-top: 0;
+}
+
+.lecture-box--summary {
+  --box-color: var(--lecture-accent);
+  border: 1px solid var(--lecture-accent);
+}
+
+.lecture-box--summary .lecture-box__title {
+  padding: 8px 18px;
+  color: #553000;
+  background: var(--lecture-accent);
+}
+
+.lecture-box--summary .lecture-box__body {
+  padding-top: 14px;
+}
+
+.lecture-box--definition {
+  --box-color: var(--lecture-definition);
+}
+
+.lecture-box--remark {
+  --box-color: var(--lecture-remark);
+}
+
+.lecture-content table {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.lecture-content th {
+  color: var(--lecture-heading);
+  border-bottom: 2px solid #b8c8f8;
+}
+
+.lecture-content .math-block {
+  margin: 1.25em 0;
+  padding: 0.4em 0;
+}
+
+.lecture-template-credit {
+  margin: 30px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid #dce4f3;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 680px) {
+  .lecture-article {
+    padding: 18px;
+  }
+
+  .lecture-banner {
+    padding: 18px 16px;
+  }
+
+  .lecture-content {
+    font-size: 16px;
+  }
+
+  .lecture-content h2 {
+    font-size: 22px;
+  }
+
+  .lecture-content h3 {
+    font-size: 19px;
+  }
+
+  .lecture-content table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+
+  .lecture-content th,
+  .lecture-content td {
+    padding: 8px;
+  }
+
+  .lecture-box__body {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+}

@@ -6,13 +6,17 @@ isCJKLanguage: true
 slug: "embedding-position-encoding"
 tags: ["LLM", "Embedding", "位置编码", "RoPE"]
 categories: ["LLM基础架构"]
+articleStyle: "lecture"
+lectureSeries: "LLM基础架构"
+lectureNumber: 1
+subtitle: "从离散符号到语义表示，再到序列中的位置关系"
 description: "从字符编码、Embedding 到绝对位置编码、ALiBi 与 RoPE，梳理 NTK、YaRN 等长上下文方法和现代模型的设计。"
 summary: "从离散符号到语义向量，再到序列中的位置关系：理解 Embedding、RoPE 及其长上下文扩展，并对照 Llama、Mistral、Qwen、DeepSeek 和 Kimi Linear 的具体设计。"
 ---
 
-> **本文摘要**
->
-> 字符编码解决“如何存储文本”，Embedding 解决“如何表示 token”，位置编码帮助模型利用“先后与距离”。本文沿着这三层关系，梳理绝对位置编码、相对位置方法、RoPE 及其长上下文扩展。
+{{< lecture-box kind="summary" title="本文摘要" >}}
+字符编码解决“如何存储文本”，Embedding 解决“如何表示 token”，位置编码帮助模型利用“先后与距离”。本文沿着这三层关系，梳理绝对位置编码、相对位置方法、RoPE 及其长上下文扩展。
+{{< /lecture-box >}}
 
 ## 计算机如何编码文本
 
@@ -31,7 +35,7 @@ summary: "从离散符号到语义向量，再到序列中的位置关系：理�
 
 ## Embedding：从 token ID 到稠密向量
 
-**定义：嵌入查表**
+{{< lecture-box kind="definition" title="定义 · 嵌入查表" >}}
 
 给定可学习矩阵 $E\in\mathbb{R}^{V\times d_e}$，token $t$ 的嵌入为
 
@@ -40,6 +44,7 @@ $$
 $$
 
 实现时直接取 $E$ 的第 $t$ 行，无须显式构造 one-hot 向量。$d_e$ 依模型而定，例如 512 或 4096，并没有固定在某个区间。
+{{< /lecture-box >}}
 
 嵌入参数通过训练学习语义与使用模式，某些关系可近似表现为向量方向或偏移，但 **线性类比不是普遍定律** 。标准输入嵌入对同一 token ID 返回相同向量，本身不含位置信息；经过模型各层后，表示才进一步依赖上下文。
 
@@ -86,9 +91,9 @@ $$
 
   各头使用不同斜率，使较远的历史位置受到不同程度的惩罚。因果掩码仍单独处理未来位置。
 
-> **分析**
->
-> **绝对位置** 回答“当前是第几个 token”，**相对位置** 突出“两者相隔多远”。相对位置偏置、ALiBi 与 RoPE 属于不同实现，不能把它们都理解成在输入嵌入上加一个向量。
+{{< lecture-box kind="analysis" title="分析" >}}
+**绝对位置** 回答“当前是第几个 token”，**相对位置** 突出“两者相隔多远”。相对位置偏置、ALiBi 与 RoPE 属于不同实现，不能把它们都理解成在输入嵌入上加一个向量。
+{{< /lecture-box >}}
 
 ## RoPE：用旋转让内积携带相对位置
 
@@ -114,7 +119,7 @@ $$
 
 把所有块组合为 $R(m)$，得到 $\widetilde{\boldsymbol{q}}_m=R(m)\boldsymbol{q}_m$、$\widetilde{\boldsymbol{k}}_n=R(n)\boldsymbol{k}_n$。若用复数表示一个二维分量对，旋转等价于乘以 $e^{\mathrm{i}m\omega_r}$。
 
-**分析**
+{{< lecture-box kind="analysis" title="分析" >}}
 
 旋转矩阵满足 $R(m)^\top R(n)=R(n-m)$，所以
 
@@ -124,14 +129,15 @@ $$
 $$
 
 内积中由位置引入的部分只依赖相对位移 $n-m$；内容向量 $\boldsymbol{q}_m,\boldsymbol{k}_n$ 仍各自携带上下文信息。对两端同时平移相同位置，旋转项保持不变。
+{{< /lecture-box >}}
 
 ### 为什么长上下文仍会遇到问题
 
 RoPE 可以计算任意位置的旋转，但训练只覆盖有限的位置和距离分布。直接把推理长度扩大，模型可能遇到不熟悉的相位组合及注意力模式，导致困惑度（PPL）升高、检索或生成质量下降；严重程度依模型、长度和训练方案而异。
 
-> **备注**
->
-> **“公式能算出来”不等于“模型已经学会”。** RoPE 提供相对位置结构，长上下文能力还依赖频率设置、长度扩展方法及相应训练。
+{{< lecture-box kind="remark" title="备注" >}}
+**“公式能算出来”不等于“模型已经学会”。** RoPE 提供相对位置结构，长上下文能力还依赖频率设置、长度扩展方法及相应训练。
+{{< /lecture-box >}}
 
 ### 线性位置插值：统一压缩位置尺度
 
@@ -156,9 +162,9 @@ $$
 
 **动态 NTK** 进一步让基数随当前序列长度调整。具体公式依实现而异；若基数在生成过程中改变，缓存中的 key 与新 query 必须使用一致的旋转约定，不能混用不同基数下的表示。
 
-> **备注**
->
-> 这里的“高频”指较小分量对索引 $r$ 对应的较快旋转；“低频”指较大 $r$ 对应的较慢旋转。**NTK-aware 并不等同于按三个频段硬划分** ，后者更接近下面的分段混合思路。
+{{< lecture-box kind="remark" title="备注" >}}
+这里的“高频”指较小分量对索引 $r$ 对应的较快旋转；“低频”指较大 $r$ 对应的较慢旋转。**NTK-aware 并不等同于按三个频段硬划分** ，后者更接近下面的分段混合思路。
+{{< /lecture-box >}}
 
 ### YaRN：分频段混合，并调整注意力尺度
 
@@ -188,12 +194,12 @@ YaRN 还结合注意力温度／幅度缩放，调整 softmax 前分数的尺度
 
 **Kimi Linear：KDA 与 MLA 的混合架构。** 2025 年论文中的模型按 3:1 的层数比例混合 KDA 与全局 MLA。其全局 MLA 层采用 NoPE，不显式加入位置编码，由 KDA 的状态递推与衰减机制传递顺序和远近信息。这个结论针对 Kimi Linear，不能泛化为整个 Kimi 家族都放弃 RoPE。
 
-> **本文要点**
->
-> - **表示：** Unicode 编码 → 分词与 token ID → Embedding。
-> - **位置：** 绝对位置向量、相对偏置、ALiBi、RoPE 各有作用位置。
-> - **扩展：** PI 统一缩放，NTK-aware 调整基数，YaRN 按频段混合并调整注意力尺度。
-> - **架构：** 位置编码、注意力窗口与 KV 压缩分别解决不同问题，可以组合使用。
+{{< lecture-box kind="summary" title="本文要点" >}}
+- **表示：** Unicode 编码 → 分词与 token ID → Embedding。
+- **位置：** 绝对位置向量、相对偏置、ALiBi、RoPE 各有作用位置。
+- **扩展：** PI 统一缩放，NTK-aware 调整基数，YaRN 按频段混合并调整注意力尺度。
+- **架构：** 位置编码、注意力窗口与 KV 压缩分别解决不同问题，可以组合使用。
+{{< /lecture-box >}}
 
 ## 参考
 

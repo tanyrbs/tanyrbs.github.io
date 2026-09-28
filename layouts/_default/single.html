@@ -1,20 +1,40 @@
 {{ define "main" }}
-  <article class="article">
-    <header class="article-header">
+  {{ $lecture := eq .Params.articleStyle "lecture" }}
+  <article class="article{{ if $lecture }} lecture-article{{ end }}">
+    <header class="article-header{{ if $lecture }} lecture-banner{{ end }}">
+      {{ if $lecture }}
+        <div class="lecture-kicker">
+          <span>{{ .Params.lectureSeries }}</span>
+          {{ with .Params.lectureNumber }}<span>第 {{ . }} 讲</span>{{ end }}
+        </div>
+      {{ end }}
       <h1>{{ .Title }}</h1>
+      {{ if $lecture }}
+        {{ with .Params.subtitle }}<p class="lecture-subtitle">{{ . }}</p>{{ end }}
+      {{ end }}
       {{ if eq .Section "blog" }}
         {{ partial "post-meta.html" . }}
       {{ end }}
     </header>
     {{ if and site.Params.showToc .TableOfContents (eq .Section "blog") }}
+      {{ if $lecture }}
+      <details class="toc lecture-toc">
+        <summary>{{ i18n "tableOfContents" }}</summary>
+        {{ .TableOfContents }}
+      </details>
+      {{ else }}
       <aside class="toc" aria-labelledby="toc-title">
         <h2 id="toc-title">{{ i18n "tableOfContents" }}</h2>
         {{ .TableOfContents }}
       </aside>
+      {{ end }}
     {{ end }}
-    <div class="article-content" data-pagefind-body>
+    <div class="article-content{{ if $lecture }} lecture-content{{ end }}" data-pagefind-body>
       {{ .Content }}
     </div>
+    {{ if $lecture }}
+      <p class="lecture-template-credit">版式改编自 <a href="https://mistatle.github.io/public/data/templates/cn_lecture_note.md">MIStatlE · CN Lecture Note</a>。</p>
+    {{ end }}
     {{ if eq .Section "blog" }}
       {{ partial "comments.html" . }}
     {{ end }}

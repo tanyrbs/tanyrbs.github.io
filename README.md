@@ -26,6 +26,8 @@ To link translations, give matching posts the same `translationKey`.
 
 Mathematical expressions can use `$...$` inline or `$$...$$` on separate lines for display equations. Hugo renders them to native MathML during the build, without a client-side script or external stylesheet. Use standard LaTeX math commands rather than document-specific macros.
 
+For the CN Lecture Note appearance, set `articleStyle: "lecture"`, `lectureSeries`, `lectureNumber`, and `subtitle` in front matter. Use the `lecture-box` shortcode with `kind="summary"`, `"definition"`, `"analysis"`, or `"remark"` and a `title`; its content supports Markdown and math. The website always uses a white background, including when the device is in dark mode.
+
 ## Local preview
 
 Install Hugo Extended, then run:

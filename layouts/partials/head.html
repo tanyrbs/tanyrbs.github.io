@@ -5,7 +5,8 @@
   {{ $title := cond .IsHome site.Title (printf "%s | %s" .Title site.Title) }}
   <meta name="description" content="{{ $description }}">
   <meta name="author" content="{{ site.Params.author }}">
-  <meta name="theme-color" content="#2f6f5e">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="color-scheme" content="light">
   <link rel="canonical" href="{{ .Permalink }}">
   {{ range .Translations }}
     <link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}">
@@ -18,6 +19,10 @@
   <link rel="shortcut icon" href="{{ "favicon.ico" | relURL }}">
   {{ $css := resources.Get "css/main.css" | minify | fingerprint }}
   <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+  {{ if eq .Params.articleStyle "lecture" }}
+    {{ $lectureCSS := resources.Get "css/lecture.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ $lectureCSS.RelPermalink }}" integrity="{{ $lectureCSS.Data.Integrity }}">
+  {{ end }}
   {{ template "_internal/opengraph.html" . }}
   {{ template "_internal/twitter_cards.html" . }}
   {{ template "_internal/schema.html" . }}

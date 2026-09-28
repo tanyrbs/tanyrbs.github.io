@@ -1,12 +1,12 @@
 :root {
-  color-scheme: light dark;
-  --bg: #f6f5f1;
+  color-scheme: light;
+  --bg: #ffffff;
   --panel: #ffffff;
   --text: #17202a;
   --muted: #5f6b76;
-  --line: #d8ded8;
-  --accent: #2f6f5e;
-  --accent-strong: #244d43;
+  --line: #dce2ed;
+  --accent: #2f54eb;
+  --accent-strong: #1f3c88;
   --panel-shadow: rgba(31, 41, 55, 0.08);
 }
 
@@ -60,7 +60,7 @@ a:hover {
   padding: 7px 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #fbfbf9;
+  background: #ffffff;
   color: var(--text);
   text-decoration: none;
   font-weight: 600;
@@ -378,25 +378,6 @@ h3 {
   margin-top: 24px;
   color: var(--muted);
   font-size: 14px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111614;
-    --panel: #18201d;
-    --text: #eff4f1;
-    --muted: #b4beb8;
-    --line: #33423b;
-    --accent: #8bc6b2;
-    --accent-strong: #b8dece;
-    --panel-shadow: rgba(0, 0, 0, 0.22);
-  }
-
-  .site-nav a,
-  .language-switcher a,
-  .section-link {
-    background: #1d2824;
-  }
 }
 
 @media (max-width: 680px) {
