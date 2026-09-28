@@ -1,11 +1,21 @@
 {{ define "main" }}
+  {{ $isCategory := and (eq .Kind "term") (eq .Data.Plural "categories") }}
+  {{ $posts := .Pages.ByDate.Reverse }}
+  {{ if $isCategory }}{{ $posts = (where .Pages "Section" "blog").ByDate.Reverse }}{{ end }}
   <header class="page-header">
     <h1>{{ .Title }}</h1>
     {{ with .Description }}<p>{{ . }}</p>{{ end }}
+    {{ if or $isCategory (eq .Section "blog") }}
+      <p class="catalog-stats">{{ i18n "postCount" (len $posts) }}</p>
+      <div class="catalog-actions">
+        {{ with site.GetPage "/archives" }}<a href="{{ .RelPermalink }}">{{ i18n "archives" }} →</a>{{ end }}
+        {{ with site.GetPage "/categories" }}<a href="{{ .RelPermalink }}">{{ if $isCategory }}← {{ i18n "backToCategories" }}{{ else }}{{ i18n "browseCategories" }} →{{ end }}</a>{{ end }}
+      </div>
+    {{ end }}
   </header>
 
   <section class="post-list" aria-label="{{ .Title }}">
-    {{ range .Pages.ByDate.Reverse }}
+    {{ range $posts }}
       <article class="post-card">
         <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.dateFormat | default "2006-01-02") }}</time>
         <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>

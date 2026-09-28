@@ -1,8 +1,35 @@
 {{ define "main" }}
+  {{ $isCategories := eq .Data.Plural "categories" }}
+  {{ $catalog := partial "blog-catalog.html" . }}
   <header class="page-header">
     <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p>{{ . }}</p>{{ end }}
+    {{ if $isCategories }}
+      <p class="catalog-stats">{{ i18n "categoryCount" (len $catalog.categories) }} · {{ i18n "postCount" (len $catalog.posts) }}</p>
+      {{ with site.GetPage "/archives" }}<div class="catalog-actions"><a href="{{ .RelPermalink }}">{{ i18n "archives" }} →</a></div>{{ end }}
+    {{ end }}
   </header>
 
+  {{ if $isCategories }}
+    <section class="category-grid" aria-label="{{ .Title }}">
+      {{ range $catalog.categories }}
+        <article class="category-card">
+          <header class="category-card-heading">
+            <h2><a href="{{ .page.RelPermalink }}">{{ .page.LinkTitle }}</a></h2>
+            <span>{{ i18n "postCount" (len .posts) }}</span>
+          </header>
+          <ul class="category-preview">
+            {{ range first 3 .posts }}
+              <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+            {{ end }}
+          </ul>
+          <a class="category-card-link" href="{{ .page.RelPermalink }}">{{ i18n "allPosts" }} →</a>
+        </article>
+      {{ else }}
+        <p class="empty-state">{{ i18n "noCategories" }}</p>
+      {{ end }}
+    </section>
+  {{ else }}
   <section class="term-grid" aria-label="{{ .Title }}">
     {{ range .Data.Terms.Alphabetical }}
       <a class="term-card" href="{{ .Page.RelPermalink }}">
@@ -11,4 +38,5 @@
       </a>
     {{ end }}
   </section>
+  {{ end }}
 {{ end }}

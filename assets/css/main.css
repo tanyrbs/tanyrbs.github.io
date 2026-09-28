@@ -358,6 +358,145 @@ h3 {
   color: var(--muted);
 }
 
+.catalog-actions,
+.year-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+
+.catalog-actions {
+  margin-top: 18px;
+  font-size: 15px;
+}
+
+.catalog-stats {
+  font-size: 14px;
+}
+
+.year-nav {
+  margin: 24px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.year-nav a {
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.archive-groups {
+  display: grid;
+  gap: 24px;
+}
+
+.archive-year,
+.category-card {
+  min-width: 0;
+  padding: 26px 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.archive-year-heading,
+.category-card-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.archive-year-heading h2 {
+  color: var(--accent-strong);
+  scroll-margin-top: 20px;
+}
+
+.archive-year-heading span,
+.category-card-heading span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.archive-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.archive-entry {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 16px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+
+.archive-entry:last-child {
+  padding-bottom: 0;
+}
+
+.archive-entry time {
+  padding-top: 3px;
+  color: var(--muted);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.archive-entry h3 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.archive-entry h3 a,
+.category-card h2 a {
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.archive-entry h3 a:hover,
+.category-card h2 a:hover {
+  text-decoration: underline;
+}
+
+.archive-entry .tag-list {
+  margin-top: 10px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 20px;
+}
+
+.category-card h2 {
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+.category-preview {
+  margin: 20px 0;
+  padding-left: 20px;
+}
+
+.category-preview li + li {
+  margin-top: 10px;
+}
+
+.category-preview a {
+  overflow-wrap: anywhere;
+}
+
+.category-card-link {
+  font-size: 14px;
+}
+
 .search-page .article-header p {
   margin: 8px 0 0;
   color: var(--muted);
@@ -423,5 +562,15 @@ h3 {
   .article,
   .post-card {
     padding: 24px;
+  }
+
+  .archive-year,
+  .category-card {
+    padding: 22px 20px;
+  }
+
+  .archive-entry {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 12px;
   }
 }

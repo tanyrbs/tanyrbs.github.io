@@ -34,6 +34,35 @@ other = "Tags"
 [categories]
 other = "Categories"
 
+[archives]
+other = "Article index"
+
+[browseCategories]
+other = "Browse by category"
+
+[browseByYear]
+other = "Browse by year"
+
+[postCount]
+one = "{{ .Count }} post"
+other = "{{ .Count }} posts"
+
+[categoryCount]
+one = "{{ .Count }} category"
+other = "{{ .Count }} categories"
+
+[viewAllCategories]
+other = "View all categories"
+
+[backToCategories]
+other = "Back to categories"
+
+[uncategorized]
+other = "Uncategorized"
+
+[noCategories]
+other = "No categories yet."
+
 [readingTime]
 other = "{{ .Count }} min read"
 

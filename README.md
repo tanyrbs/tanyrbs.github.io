@@ -28,6 +28,8 @@ Mathematical expressions can use `$...$` inline or `$$...$$` on separate lines f
 
 For the CN Lecture Note appearance, set `articleStyle: "lecture"`, `lectureSeries`, `lectureNumber`, and `subtitle` in front matter. Use the `lecture-box` shortcode with `kind="summary"`, `"definition"`, `"analysis"`, or `"remark"` and a `title`; its content supports Markdown and math. The website always uses a white background, including when the device is in dark mode.
 
+The **Article index** groups published blog posts by year, newest first. **Categories** lists topics, article counts, and recent titles, with links to each category's complete article list. Both are generated from the current language's blog content during every build; add a post's topics through its `categories` front matter. No manual index update is needed. Posts without a category remain visible in the article index as uncategorized.
+
 ## Local preview
 
 Install Hugo Extended, then run:

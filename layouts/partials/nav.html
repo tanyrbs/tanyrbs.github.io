@@ -3,6 +3,12 @@
   {{ with site.GetPage "section" "blog" }}
     <a href="{{ .RelPermalink }}"{{ if eq $.Section "blog" }} aria-current="page"{{ end }}>{{ i18n "blog" }}</a>
   {{ end }}
+  {{ with site.GetPage "/archives" }}
+    <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "archives" }}</a>
+  {{ end }}
+  {{ with site.GetPage "/categories" }}
+    <a href="{{ .RelPermalink }}"{{ if or (eq $.RelPermalink .RelPermalink) (and (eq $.Kind "term") (eq $.Data.Plural "categories")) }} aria-current="page"{{ end }}>{{ i18n "categories" }}</a>
+  {{ end }}
   {{ with site.GetPage "page" "about" }}
     <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "about" }}</a>
   {{ end }}

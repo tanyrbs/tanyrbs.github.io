@@ -34,6 +34,33 @@ other = "标签"
 [categories]
 other = "分类"
 
+[archives]
+other = "文章索引"
+
+[browseCategories]
+other = "按分类浏览"
+
+[browseByYear]
+other = "按年份浏览"
+
+[postCount]
+other = "{{ .Count }} 篇文章"
+
+[categoryCount]
+other = "{{ .Count }} 个分类"
+
+[viewAllCategories]
+other = "查看全部分类"
+
+[backToCategories]
+other = "返回分类总览"
+
+[uncategorized]
+other = "未分类"
+
+[noCategories]
+other = "暂无分类。"
+
 [readingTime]
 other = "{{ .Count }} 分钟阅读"
 

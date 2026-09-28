@@ -1,0 +1,49 @@
+{{ define "main" }}
+  {{ $catalog := partial "blog-catalog.html" . }}
+  {{ $groups := $catalog.posts.GroupByDate "2006" "desc" }}
+  <header class="page-header">
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p>{{ . }}</p>{{ end }}
+    <p class="catalog-stats">{{ i18n "postCount" (len $catalog.posts) }} · {{ i18n "categoryCount" (len $catalog.categories) }}</p>
+    <div class="catalog-actions">
+      {{ with site.GetPage "/categories" }}<a href="{{ .RelPermalink }}">{{ i18n "browseCategories" }} →</a>{{ end }}
+      {{ with site.GetPage "/search" }}<a href="{{ .RelPermalink }}">{{ i18n "search" }} →</a>{{ end }}
+    </div>
+  </header>
+
+  {{ with $groups }}
+    <nav class="year-nav" aria-label="{{ i18n "browseByYear" }}">
+      <span>{{ i18n "browseByYear" }}</span>
+      {{ range . }}<a href="#year-{{ .Key }}">{{ .Key }}</a>{{ end }}
+    </nav>
+    <div class="archive-groups">
+      {{ range . }}
+        <section class="archive-year" aria-labelledby="year-{{ .Key }}">
+          <header class="archive-year-heading">
+            <h2 id="year-{{ .Key }}">{{ .Key }}</h2>
+            <span>{{ i18n "postCount" (len .Pages) }}</span>
+          </header>
+          <ul class="archive-list">
+            {{ range .Pages }}
+              <li class="archive-entry">
+                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "01-02" }}</time>
+                <div class="archive-entry-content">
+                  <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+                  <ul class="tag-list" aria-label="{{ i18n "categories" }}">
+                    {{ range .GetTerms "categories" }}
+                      <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
+                    {{ else }}
+                      <li>{{ i18n "uncategorized" }}</li>
+                    {{ end }}
+                  </ul>
+                </div>
+              </li>
+            {{ end }}
+          </ul>
+        </section>
+      {{ end }}
+    </div>
+  {{ else }}
+    <p class="empty-state">{{ i18n "noPosts" }}</p>
+  {{ end }}
+{{ end }}

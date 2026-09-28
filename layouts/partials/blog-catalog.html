@@ -1,0 +1,9 @@
+{{- $posts := (where site.RegularPages "Section" "blog").ByDate.Reverse -}}
+{{- $categories := slice -}}
+{{- range site.Taxonomies.categories.Alphabetical -}}
+  {{- $categoryPosts := (where .Pages "Section" "blog").ByDate.Reverse -}}
+  {{- if $categoryPosts -}}
+    {{- $categories = $categories | append (dict "page" .Page "posts" $categoryPosts) -}}
+  {{- end -}}
+{{- end -}}
+{{- return (dict "posts" $posts "categories" $categories) -}}
