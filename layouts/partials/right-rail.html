@@ -1,0 +1,42 @@
+{{ $posts := where site.RegularPages "Section" "blog" }}
+<section class="rail-panel">
+  <h2>{{ i18n "latestPosts" }}</h2>
+  <ul class="rail-list">
+    {{ range first 5 ($posts.ByDate.Reverse) }}
+      <li>
+        <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.dateFormat | default "2006-01-02") }}</time>
+      </li>
+    {{ else }}
+      <li class="empty-state">{{ i18n "noPosts" }}</li>
+    {{ end }}
+  </ul>
+</section>
+
+{{ with site.Taxonomies.categories.ByCount }}
+  <section class="rail-panel">
+    <div class="rail-heading">
+      <h2>{{ i18n "categories" }}</h2>
+      <a href="{{ "categories/" | relLangURL }}">{{ i18n "viewAll" }}</a>
+    </div>
+    <ul class="rail-list term-list">
+      {{ range first 8 . }}
+        <li><a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }}</a><span>{{ .Count }}</span></li>
+      {{ end }}
+    </ul>
+  </section>
+{{ end }}
+
+{{ with site.Taxonomies.tags.ByCount }}
+  <section class="rail-panel">
+    <div class="rail-heading">
+      <h2>{{ i18n "tags" }}</h2>
+      <a href="{{ "tags/" | relLangURL }}">{{ i18n "viewAll" }}</a>
+    </div>
+    <ul class="rail-tags">
+      {{ range first 16 . }}
+        <li><a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }} <span>{{ .Count }}</span></a></li>
+      {{ end }}
+    </ul>
+  </section>
+{{ end }}

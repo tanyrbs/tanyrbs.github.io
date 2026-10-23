@@ -2,10 +2,38 @@
 <html lang="{{ site.Language.Lang }}">
   {{ partial "head.html" . }}
   <body>
-    <main class="site-shell">
-      {{ partial "nav.html" . }}
-      {{ block "main" . }}{{ end }}
+    <header class="mobile-header">
+      <a class="mobile-brand" href="{{ site.Home.RelPermalink }}">{{ site.Title }}</a>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-sidebar">
+        {{ i18n "menu" }}
+      </button>
+    </header>
+    <div class="site-layout">
+      <aside class="site-sidebar" id="site-sidebar">
+        <div class="sidebar-content">
+          <a class="brand" href="{{ site.Home.RelPermalink }}">
+            <span class="brand-title">{{ site.Title }}</span>
+            <span class="brand-description">{{ site.Params.description }}</span>
+          </a>
+          {{ partial "nav.html" . }}
+          {{ partial "profile.html" . }}
+          <div class="sidebar-controls">
+            <span class="language-switcher" aria-label="{{ i18n "language" }}">
+              {{ range .AllTranslations }}
+                <a href="{{ .RelPermalink }}"{{ if eq .Language.Lang $.Language.Lang }} aria-current="page"{{ end }}>{{ .Language.Label }}</a>
+              {{ end }}
+            </span>
+            <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">{{ i18n "darkMode" }}</button>
+          </div>
+        </div>
+      </aside>
+      <main class="site-main" id="main-content">
+        {{ block "main" . }}{{ end }}
+      </main>
+      <aside class="site-rail" aria-label="{{ i18n "siteInformation" }}">
+        {{ partial "right-rail.html" . }}
+      </aside>
       {{ partial "footer.html" . }}
-    </main>
+    </div>
   </body>
 </html>

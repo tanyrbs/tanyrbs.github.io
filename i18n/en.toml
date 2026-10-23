@@ -83,3 +83,42 @@ other = "Language"
 
 [rss]
 other = "RSS"
+
+[archive]
+other = "Archive"
+
+[latestPosts]
+other = "Latest posts"
+
+[viewAll]
+other = "All"
+
+[readMore]
+other = "Read more"
+
+[menu]
+other = "Menu"
+
+[darkMode]
+other = "Toggle dark mode"
+
+[siteInformation]
+other = "Site information"
+
+[siteNavigation]
+other = "Site navigation"
+
+[noTerms]
+other = "No categories or tags yet."
+
+[articleNavigation]
+other = "Article navigation"
+
+[newerPost]
+other = "Newer post"
+
+[olderPost]
+other = "Older post"
+
+[lectureTemplateCredit]
+other = "Lecture layout adapted from the"

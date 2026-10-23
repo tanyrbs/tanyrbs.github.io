@@ -17,10 +17,12 @@
   <section class="post-list" aria-label="{{ .Title }}">
     {{ range $posts }}
       <article class="post-card">
-        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.dateFormat | default "2006-01-02") }}</time>
         <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-        <p>{{ .Summary | plainify }}</p>
         {{ partial "post-meta.html" . }}
+        <p class="post-summary">{{ .Summary | plainify }}</p>
+        <div class="post-card-footer">
+          <a class="read-more" href="{{ .RelPermalink }}">{{ i18n "readMore" }} <span aria-hidden="true">&rarr;</span></a>
+        </div>
       </article>
     {{ else }}
       <p class="empty-state">{{ i18n "noPosts" }}</p>

@@ -9,7 +9,6 @@
       {{ with site.GetPage "/archives" }}<div class="catalog-actions"><a href="{{ .RelPermalink }}">{{ i18n "archives" }} →</a></div>{{ end }}
     {{ end }}
   </header>
-
   {{ if $isCategories }}
     <section class="category-grid" aria-label="{{ .Title }}">
       {{ range $catalog.categories }}
@@ -36,6 +35,8 @@
         <span>{{ .Page.LinkTitle }}</span>
         <strong>{{ .Count }}</strong>
       </a>
+    {{ else }}
+      <p class="empty-state">{{ i18n "noTerms" }}</p>
     {{ end }}
   </section>
   {{ end }}

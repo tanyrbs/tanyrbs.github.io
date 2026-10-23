@@ -1,11 +1,13 @@
 {{ define "main" }}
   {{ $lecture := eq .Params.articleStyle "lecture" }}
-  <article class="article{{ if $lecture }} lecture-article{{ end }}">
+  <article class="article-surface{{ if $lecture }} lecture-article{{ end }}">
     <header class="article-header{{ if $lecture }} lecture-banner{{ end }}">
       {{ if $lecture }}
         <div class="lecture-kicker">
           <span>{{ .Params.lectureSeries }}</span>
-          {{ with .Params.lectureNumber }}<span>第 {{ . }} 讲</span>{{ end }}
+          {{ with .Params.lectureNumber }}
+            <span>{{ if eq $.Language.Lang "zh-cn" }}第 {{ . }} 讲{{ else }}Lecture {{ . }}{{ end }}</span>
+          {{ end }}
         </div>
       {{ end }}
       <h1>{{ .Title }}</h1>
@@ -18,10 +20,10 @@
     </header>
     {{ if and site.Params.showToc .TableOfContents (eq .Section "blog") }}
       {{ if $lecture }}
-      <details class="toc lecture-toc">
-        <summary>{{ i18n "tableOfContents" }}</summary>
-        {{ .TableOfContents }}
-      </details>
+        <details class="toc lecture-toc">
+          <summary>{{ i18n "tableOfContents" }}</summary>
+          {{ .TableOfContents }}
+        </details>
       {{ else }}
       <aside class="toc" aria-labelledby="toc-title">
         <h2 id="toc-title">{{ i18n "tableOfContents" }}</h2>
@@ -33,10 +35,16 @@
       {{ .Content }}
     </div>
     {{ if $lecture }}
-      <p class="lecture-template-credit">版式改编自 <a href="https://mistatle.github.io/public/data/templates/cn_lecture_note.md">MIStatlE · CN Lecture Note</a>。</p>
+      <p class="lecture-template-credit">{{ i18n "lectureTemplateCredit" }} <a href="https://mistatle.github.io/public/data/templates/cn_lecture_note.md">CN Lecture Note</a>.</p>
     {{ end }}
     {{ if eq .Section "blog" }}
       {{ partial "comments.html" . }}
     {{ end }}
   </article>
+  {{ if eq .Section "blog" }}
+    <nav class="article-pagination" aria-label="{{ i18n "articleNavigation" }}">
+      {{ with .PrevInSection }}<a href="{{ .RelPermalink }}"><span>{{ i18n "newerPost" }}</span>{{ .LinkTitle }}</a>{{ end }}
+      {{ with .NextInSection }}<a href="{{ .RelPermalink }}"><span>{{ i18n "olderPost" }}</span>{{ .LinkTitle }}</a>{{ end }}
+    </nav>
+  {{ end }}
 {{ end }}

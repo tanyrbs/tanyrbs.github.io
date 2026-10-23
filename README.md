@@ -24,11 +24,11 @@ Post content goes here.
 
 To link translations, give matching posts the same `translationKey`.
 
-Mathematical expressions can use `$...$` inline or `$$...$$` on separate lines for display equations. Hugo renders them to native MathML during the build, without a client-side script or external stylesheet. Use standard LaTeX math commands rather than document-specific macros.
+## Draft from Obsidian
 
-For the CN Lecture Note appearance, set `articleStyle: "lecture"`, `lectureSeries`, `lectureNumber`, and `subtitle` in front matter. Use the `lecture-box` shortcode with `kind="summary"`, `"definition"`, `"analysis"`, or `"remark"` and a `title`; its content supports Markdown and math. The website always uses a white background, including when the device is in dark mode.
+Keep your vault as the writing workspace, then copy only notes you intend to publish into `content/en/blog/` or `content/zh-cn/blog/`. Add the front matter above before publishing. Store public images with the post or under `static/`; avoid pointing published pages at files elsewhere in a private vault.
 
-The **Article index** groups published blog posts by year, newest first. **Categories** lists topics, article counts, and recent titles, with links to each category's complete article list. Both are generated from the current language's blog content during every build; add a post's topics through its `categories` front matter. No manual index update is needed. Posts without a category remain visible in the article index as uncategorized.
+Math can use `$...$` inline or `$$...$$` on separate lines. Posts tagged with `articleStyle: "lecture"` use the bundled lecture-note layout and can use the `lecture-box` shortcode. The article index groups published posts by year, and the categories page is generated from published posts' `categories` front matter.
 
 ## Local preview
 

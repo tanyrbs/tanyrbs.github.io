@@ -81,3 +81,42 @@ other = "语言"
 
 [rss]
 other = "RSS"
+
+[archive]
+other = "归档"
+
+[latestPosts]
+other = "最新发布"
+
+[viewAll]
+other = "全部"
+
+[readMore]
+other = "阅读全文"
+
+[menu]
+other = "菜单"
+
+[darkMode]
+other = "切换深色模式"
+
+[siteInformation]
+other = "站点信息"
+
+[siteNavigation]
+other = "站点导航"
+
+[noTerms]
+other = "暂无分类或标签。"
+
+[articleNavigation]
+other = "文章导航"
+
+[newerPost]
+other = "较新文章"
+
+[olderPost]
+other = "较早文章"
+
+[lectureTemplateCredit]
+other = "讲义版式改编自"

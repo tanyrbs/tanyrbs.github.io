@@ -34,7 +34,7 @@
   margin: 0 0 12px;
   color: var(--lecture-heading);
   font-family: "Times New Roman", "Noto Serif CJK SC", "Songti SC", SimSun, serif;
-  font-size: clamp(28px, 4vw, 38px);
+  font-size: 32px;
   line-height: 1.35;
   text-wrap: balance;
 }
