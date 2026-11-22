@@ -1,0 +1,170 @@
+% 版式
+\usepackage{geometry}
+\geometry{
+  a4paper,
+  margin=2.5cm,
+  headheight=14pt,
+}
+
+% 主题色（克制、印刷友好）
+\usepackage{xcolor}
+\definecolor{themeaccent}{HTML}{1a5f7a}
+\definecolor{themecolorthm}{HTML}{1a5f7a}
+\definecolor{themecolordef}{HTML}{2d6a4f}
+\definecolor{themecolorremark}{HTML}{8b6914}
+
+% 定理块底纹浓度（xcolor：数字越大底色越深；旧版约 !4–!6，此处加深便于对比）
+\newcommand{\thmshadecolor}{themecolorthm!18}
+\newcommand{\defshadecolor}{themecolordef!14}
+\newcommand{\remarkshadecolor}{themecolorremark!12}
+
+% 数学
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage[anycase]{thmtools}
+\usepackage{bm}
+
+% 行距（可读性）
+\usepackage{setspace}
+\onehalfspacing
+
+% 页眉页脚
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{themeaccent!70!black}\nouppercase{\leftmark}}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\color{themeaccent!50!black}\hrule height 0.4pt}
+
+% 章节标题着色 + 装饰线（ctex）
+\ctexset{
+  section/format     = \Large\bfseries\color{themeaccent},
+  section/aftername  = \hspace{0.5em},
+  section/aftertitle = \par\vspace{-4pt}%
+    {\color{themeaccent!40}\rule{\linewidth}{0.5pt}}\vspace{4pt},
+  subsection/format  = \large\bfseries\color{themeaccent!88!black},
+}
+
+% 常用配对符号（mathtools）
+\DeclarePairedDelimiter{\paren}{(}{)}
+\DeclarePairedDelimiter{\sqbrk}{[}{]} % 勿用 \brack，与内核冲突
+\DeclarePairedDelimiter{\curlbrace}{\{}{\}} % 勿用 \brace，与内核冲突
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+
+% 定理样式：彩色标题（底纹在 \declaretheorem 中用 shaded 指定）
+\declaretheoremstyle[
+  spaceabove=6pt,
+  spacebelow=6pt,
+  headfont=\bfseries\color{themecolorthm},
+  notefont=\bfseries\color{themecolorthm!80!black},
+  bodyfont=\itshape,
+  headpunct={.},
+  postheadspace=0.5em,
+]{styletheorem}
+
+\declaretheoremstyle[
+  spaceabove=6pt,
+  spacebelow=6pt,
+  headfont=\bfseries\color{themecolordef},
+  notefont=\bfseries\color{themecolordef!80!black},
+  bodyfont=\normalfont,
+  headpunct={.},
+  postheadspace=0.5em,
+]{styledefinition}
+
+\declaretheoremstyle[
+  spaceabove=6pt,
+  spacebelow=6pt,
+  headfont=\bfseries\color{themecolorremark},
+  notefont=\bfseries\color{themecolorremark!80!black},
+  bodyfont=\normalfont,
+  headpunct={.},
+  postheadspace=0.5em,
+]{styleremark}
+
+\declaretheorem[
+  style=styletheorem,
+  name=定理,
+  numberwithin=section,
+  shaded={bgcolor=\thmshadecolor, margin=0pt},
+]{theorem}
+
+\declaretheorem[
+  style=styletheorem,
+  name=引理,
+  sibling=theorem,
+  shaded={bgcolor=\thmshadecolor, margin=0pt},
+]{lemma}
+
+\declaretheorem[
+  style=styletheorem,
+  name=命题,
+  sibling=theorem,
+  shaded={bgcolor=\thmshadecolor, margin=0pt},
+]{proposition}
+
+\declaretheorem[
+  style=styletheorem,
+  name=推论,
+  sibling=theorem,
+  shaded={bgcolor=\thmshadecolor, margin=0pt},
+]{corollary}
+
+\declaretheorem[
+  style=styledefinition,
+  name=定义,
+  sibling=theorem,
+  shaded={bgcolor=\defshadecolor, margin=0pt},
+]{definition}
+
+\declaretheorem[
+  style=styleremark,
+  name=注,
+  sibling=theorem,
+  shaded={bgcolor=\remarkshadecolor, margin=0pt},
+]{remark}
+
+\renewcommand{\proofname}{\textcolor{themecolorthm}{证明}}
+\renewcommand{\qedsymbol}{\textcolor{themecolorthm}{$\blacksquare$}}
+
+% 彩色标题页（替代 \maketitle）
+\makeatletter
+\newcommand{\maketitlecolored}{%
+  \begin{center}\leavevmode
+    {\LARGE\bfseries\color{themeaccent}\@title\par}
+    \vspace{0.8em}
+    {\large\@author\par}
+    {\normalsize\color{black!55}\@date\par}
+  \end{center}
+  \vspace{1.8em}%
+}
+\makeatother
+
+% 表格（专业三线表）
+\usepackage{booktabs}
+
+% 图表标题样式
+\usepackage{caption}
+\captionsetup{labelfont={bf,color=themeaccent}, labelsep=period, font=small}
+
+% 链接（置于 preamble 末尾）
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=themeaccent!90!black,
+  citecolor=themecolordef!75!black,
+  urlcolor=themeaccent,
+}
+
+% 智能交叉引用（须在 hyperref 之后加载）
+\usepackage{cleveref}
+\crefname{theorem}{定理}{定理}
+\crefname{lemma}{引理}{引理}
+\crefname{proposition}{命题}{命题}
+\crefname{corollary}{推论}{推论}
+\crefname{definition}{定义}{定义}
+\crefname{remark}{注}{注}
+\crefformat{equation}{式~(#2#1#3)}

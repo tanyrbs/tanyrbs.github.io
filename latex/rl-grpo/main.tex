@@ -1,0 +1,127 @@
+%! title: GRPO 与 PPO：Rollout、Scoring 与参数更新
+%! date: 2026-10-26
+%! slug: rl-grpo
+%! series: 强化学习
+%! number: 3
+%! tags: 强化学习, PPO, GRPO, Rollout, 重要性采样
+%! description: 把一次 PPO 迭代拆成 Rollout 与 Scoring 两次模型调用：一个串行、随机、慢，一个并行、确定、快；再说明两种 log 概率如何变成重要性权重 r_t。
+\documentclass[UTF8,fontset=fandol]{ctexart}
+
+\input{preamble}
+
+\title{GRPO 与 PPO：Rollout、Scoring 与参数更新}
+\author{THT}
+\date{2026.10.26}
+
+\begin{document}
+\maketitlecolored
+
+\section{Rollout：逐个 token 重新生成}
+
+模型根据输入，一个 token 一个 token 地采样，最终拼成一个完整的句子。数学上，第 $t$ 步是在给定输入 $x$ 和已经生成的前缀 $y_{<t}$ 的条件下，从策略分布里抽一个 token：
+\[
+y_t \sim \pi_\theta(\cdot \mid x,\, y_{<t}),
+\qquad
+y_{<t} = (y_1, \dots, y_{t-1}).
+\]
+注意那个 $\sim$：它是\textbf{采样}，不是取最大值。
+
+【举个具体例子】输入 prompt 是「今天天气」。
+
+\begin{enumerate}
+  \item 模型跑一次前向，输出词表上的概率分布。假设「不」的概率是 30\%，「很」是 50\%，「真」是 20\%。按概率随机抽样，这次抽中了「很」。
+  \item 把「今天天气很」重新输入模型，再跑一次前向，抽出「好」。
+  \item 把「今天天气很好」输入模型，抽出「。」，遇到结束符，停止。
+\end{enumerate}
+
+于是这一次 Rollout 的结果是「今天天气很好。」。它的关键特征：
+
+\begin{itemize}
+  \item \textbf{自回归串行}：必须先生成第 1 个词，才能算第 2 个词的概率。生成 100 个 token 就要跑 100 次前向传播（虽然有 KV Cache 加速，但依然是串行的）。
+  \item \textbf{随机性}：涉及采样，同样的输入每次都可能得到不同的句子。
+  \item \textbf{极慢}：这正是大模型推理比训练慢得多的原因。在 PPO 里，Rollout 阶段通常占到 80\% 的时间。
+\end{itemize}
+
+\section{Scoring：只计算概率}
+
+给定一段完全确定的文本（prompt 加上完整的回答），计算模型生成这段文本的对数概率。数学上就是查表再取对数：
+\[
+\log \pi_\theta(y_t \mid x,\, y_{<t}).
+\]
+这里没有采样，只有查表和取对数。
+
+【接着上面的例子】现在手里已经有「今天天气很好。」这句完整的话，把它直接一股脑喂给模型。模型经过一次前向传播（靠因果掩码，也就是三角掩码），可以同时输出所有位置的下一个词的概率。我们不需要关心模型「想」生成什么，只要去看它给出的数字：
+
+\begin{itemize}
+  \item 输入「今天天气」后，「很」的概率是 0.6，取对数得 $\log(0.6) \approx -0.51$；
+  \item 输入「今天天气很」后，「好」的概率是 0.8，取对数得 $\log(0.8) \approx -0.22$；
+  \item 输入「今天天气很好」后，「。」的概率是 0.9，取对数得 $\log(0.9) \approx -0.10$。
+\end{itemize}
+
+总的 log 概率是这三项之和：
+\[
+\log \pi_\theta(y \mid x)
+= -0.51 + (-0.22) + (-0.10) = -0.83 .
+\]
+
+它的关键特征：
+
+\begin{itemize}
+  \item \textbf{完全并行}：整段文本已知，注意力机制可以一次算出所有位置的 log 概率。句子有 100 个词还是 1000 个词，都只跑 1 次前向，而不是像生成那样循环 100 次。
+  \item \textbf{确定性}：同样的输入和参数，算出来的概率永远是同一个数。
+  \item \textbf{极快}：比 Rollout 快得多。
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{lll}
+\hline
+ & Rollout & Scoring \\
+\hline
+输入 & 截至目前已生成的前缀 & prompt + 完整回答 \\
+调用方式 & 逐 token、串行 & 一次前向、并行 \\
+输出 & 下一步的概率分布，按概率抽样 & 每个位置的 log 概率 \\
+随机性 & 有（采样） & 没有 \\
+速度 & 慢，占 PPO 大部分时间 & 快 \\
+在 PPO 里做什么 & 产生轨迹（数据） & 算重要性权重 \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{放进 PPO：两个模型、两个阶段}
+
+PPO 的一次迭代里有两个模型同时在场：旧模型 $\pi_{\theta_{\text{old}}}$ 和新模型 $\pi_\theta$。两个阶段各用其中一个。
+
+\subsection{阶段一：Rollout，用旧模型重新生成}
+
+这个阶段用 $\pi_{\theta_{\text{old}}}$ 去生成。生成的目的不是产出最终答案，而是\textbf{拿到数据}：需要完整的句子去让奖励模型打分，去让 critic 估计优势值。生成的同时顺手记下旧模型给出每个词的概率，即
+\[
+\log \pi_{\theta_{\text{old}}}(y_t \mid x,\, y_{<t}),
+\]
+这一项之后会当重要性权重的\textbf{分母}。
+
+\subsection{阶段二：Update，用新模型只计算概率}
+
+数据采好之后开始训练新模型 $\pi_\theta$。更新每一次参数时，\textbf{绝对不需要重新生成}，因为数据已经定死了。要做的是：
+
+\begin{enumerate}
+  \item 把已有的完整句子喂给 $\pi_\theta$；
+  \item 只计算概率，得到新模型给出这些词的
+  $\log \pi_\theta(y_t \mid x, y_{<t})$，这是\textbf{分子}；
+  \item 算两者的比值（重要性权重）
+  \[
+  r_t \;=\; \exp\!\left(\log \pi_\theta(y_t \mid x, y_{<t}) - \log \pi_{\theta_{\text{old}}}(y_t \mid x, y_{<t})\right);
+  \]
+  \item 用 $r_t$ 算 loss，更新参数。
+\end{enumerate}
+
+这一步只做前向，不采样，因此可以把同一批数据反复用来更新多次：这正是重要性采样的意义，也是 PPO 比「收集—更新」一次一换的做法更省的地方。
+
+\section{参考}
+
+\begin{enumerate}
+\item \url{https://zhuanlan.zhihu.com/p/671780768}
+\item \url{https://zhuanlan.zhihu.com/p/1082394115}
+\item \url{https://zhuanlan.zhihu.com/p/721073733}
+\end{enumerate}
+
+\end{document}
