@@ -11,12 +11,6 @@
     {{ $groups = merge $groups (dict $key ($existing | append .)) }}
   {{ end }}
 
-  <header class="page-header">
-    <h1>{{ .Title }}</h1>
-    {{ with .Description }}<p>{{ . }}</p>{{ end }}
-    <p class="catalog-stats">{{ i18n "noteCount" (dict "Count" (len $notes)) }}</p>
-  </header>
-
   {{ if $notes }}
     {{ range $seriesOrder }}
       {{ $items := index $groups . }}

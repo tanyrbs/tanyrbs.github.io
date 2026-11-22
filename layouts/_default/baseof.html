@@ -13,7 +13,10 @@
         <div class="sidebar-content">
           <a class="brand" href="{{ site.Home.RelPermalink }}">
             <span class="brand-title">{{ site.Title }}</span>
-            <span class="brand-description">{{ site.Params.description }}</span>
+            <span class="brand-description">
+              <span>{{ site.Params.affiliation }}</span>
+              <span>{{ site.Params.affiliationSecondary }}</span>
+            </span>
           </a>
           {{ partial "nav.html" . }}
           {{ partial "profile.html" . }}
@@ -22,11 +25,9 @@
       <main class="site-main" id="main-content">
         {{ block "main" . }}{{ end }}
       </main>
-      {{ if not .IsHome }}
       <aside class="site-rail" aria-label="{{ i18n "siteInformation" }}">
         {{ partial "right-rail.html" . }}
       </aside>
-      {{ end }}
       {{ partial "footer.html" . }}
     </div>
   </body>

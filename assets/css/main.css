@@ -932,3 +932,43 @@ button:focus-visible {
 .home-sections a:hover {
   color: var(--accent);
 }
+/* 学校分两行显示 */
+.brand-description span,
+.profile-affiliation span {
+  display: block;
+}
+.brand-description span + span,
+.profile-affiliation span + span {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.92em;
+}
+.profile-affiliation span:first-child {
+  color: var(--text);
+}
+/* 笔记列表：每个系列一个框 */
+.notes-series {
+  margin: 0 0 1.6em;
+  padding: 1.4em 1.6em;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.notes-series:last-child {
+  margin-bottom: 0;
+}
+.notes-series h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.9em;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid var(--line);
+}
+.notes-series ol {
+  margin: 0;
+  padding-left: 1.3em;
+  line-height: 1.9;
+}
+.notes-series-desc {
+  color: var(--muted);
+}

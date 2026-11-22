@@ -156,14 +156,6 @@
 .related-notes ul { margin: 0; padding-left: 1.2em; line-height: 1.8; }
 
 /* 笔记列表：按系列分组 */
-.notes-series { margin: 0 0 2.4em; }
-.notes-series h2 {
-  font-size: 1.15rem;
-  margin: 0 0 0.8em;
-  padding-bottom: 0.4em;
-  border-bottom: 1px solid var(--line);
-}
-.notes-series ol { margin: 0; padding-left: 1.3em; line-height: 1.9; }
 /* tex4ht 的 \begin{center} 与插图 */
 .latex-note .center {
   text-align: center;

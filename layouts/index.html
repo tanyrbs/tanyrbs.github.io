@@ -1,20 +1,24 @@
 {{ define "main" }}
   <header class="page-header home-heading">
-    <h1>{{ site.Title }}</h1>
-    <p class="home-affiliation">{{ site.Params.affiliation }}</p>
+    <h1>{{ i18n "recentPosts" }}</h1>
+    <p>{{ site.Params.description }}</p>
   </header>
 
-  <section class="home-intro" aria-label="{{ i18n "about" }}">
-    <p>{{ i18n "homeIntro" }}</p>
-    <div class="home-links">
-      <a href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a>
-      <a href="{{ site.Params.github }}" rel="me">github.com/tanyrbs</a>
-    </div>
-    <nav class="home-sections" aria-label="{{ i18n "siteNavigation" }}">
-      {{ with site.GetPage "section" "notes" }}<a href="{{ .RelPermalink }}">{{ i18n "notes" }}</a>{{ end }}
-      {{ with site.GetPage "section" "blog" }}<a href="{{ .RelPermalink }}">{{ i18n "blog" }}</a>{{ end }}
-      {{ with site.GetPage "/archives" }}<a href="{{ .RelPermalink }}">{{ i18n "archives" }}</a>{{ end }}
-      {{ with site.GetPage "page" "about" }}<a href="{{ .RelPermalink }}">{{ i18n "about" }}</a>{{ end }}
-    </nav>
+  {{ $posts := where site.RegularPages "Section" "in" (slice "blog" "notes") }}
+  <section class="post-list" aria-label="{{ i18n "recentPosts" }}">
+    {{ range first 8 ($posts.ByDate.Reverse) }}
+      <article class="post-card">
+        <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+        {{ partial "post-meta.html" . }}
+        {{ $summary := .Summary | plainify }}
+        {{ if not $summary }}{{ $summary = .Description }}{{ end }}
+        {{ with $summary }}<p class="post-summary">{{ . }}</p>{{ end }}
+        <div class="post-card-footer">
+          <a class="read-more" href="{{ .RelPermalink }}">{{ i18n "readMore" }} <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </article>
+    {{ else }}
+      <p class="empty-state">{{ i18n "noPosts" }}</p>
+    {{ end }}
   </section>
 {{ end }}

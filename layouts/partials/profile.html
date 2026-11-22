@@ -2,7 +2,10 @@
   <h2>{{ i18n "about" }}</h2>
   <img class="avatar" src="{{ site.Params.avatar | relURL }}" width="300" height="273" alt="{{ site.Params.author }}">
   <p class="profile-name">{{ site.Params.author }}</p>
-  <p class="profile-affiliation">{{ site.Params.affiliation }}</p>
+  <p class="profile-affiliation">
+    <span>{{ site.Params.affiliation }}</span>
+    <span>{{ site.Params.affiliationSecondary }}</span>
+  </p>
   <div class="profile-links">
     <a href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a>
     <a href="{{ site.Params.github }}" rel="me">github.com/tanyrbs</a>
