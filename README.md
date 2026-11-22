@@ -182,6 +182,29 @@ npm run publish    # notes + site + search
 ，行间用单独成段的 `$` … `$`。构建时由 KaTeX 转成 MathML，
 页面不加载任何 JS。图片直接写 Markdown 语法，文件放 `static/` 或与文章同名的 page bundle 里。
 
+### 新增一个系列
+
+系列就是 front matter 里的一个字符串，不需要注册任何东西：
+
+```yaml
+lectureSeries: "扩散模型"    # Markdown 短文
+lectureNumber: 1             # 第几讲，决定框内排序
+categories: ["扩散模型"]      # 想让右侧栏「分类」也有它才写
+```
+
+LaTeX 笔记写在 `main.tex` 开头：
+
+```latex
+%! series: 扩散模型
+%! number: 1
+```
+
+推上去之后会自动出现：`/articles/` 里多一个系列框、`/categories/扩散模型/` 分类页、
+每个标签对应的 `/tags/xxx/` 页。系列名字就是分组键，改了名字等于换一个系列，
+所以系列内的文章要一起改。
+
+框的显示顺序在 `hugo.toml` 的 `params.seriesOrder` 里指定，没列出的按名字排在最后。
+
 ### 写 LaTeX 笔记
 
 ```bash

@@ -10,6 +10,8 @@ defaultContentLanguage = "zh-cn"
 locale = "zh-CN"
 
 [params]
+  # /articles/ 里系列框的显示顺序；没列出的系列按名字排在后面
+  seriesOrder = ["强化学习", "verl 框架解析", "LLM基础架构"]
   description = "谭浩陶，香港中文大学（深圳），华东理工大学"
   author = "谭浩陶"
   affiliation = "香港中文大学（深圳）"

@@ -9,9 +9,12 @@
     {{ $groups = merge $groups (dict $key ($existing | append .)) }}
   {{ end }}
 
+  {{ $preferred := site.Params.seriesOrder | default slice }}
   {{ $series := slice }}
-  {{ range $order }}{{ if . }}{{ $series = $series | append . }}{{ end }}{{ end }}
-  {{ $series = sort $series }}
+  {{ range $preferred }}{{ if index $groups . }}{{ $series = $series | append . }}{{ end }}{{ end }}
+  {{ $rest := slice }}
+  {{ range $order }}{{ if and . (not (in $series .)) }}{{ $rest = $rest | append . }}{{ end }}{{ end }}
+  {{ $series = $series | append (sort $rest) }}
 
   {{ range $series }}
     {{ $items := index $groups . }}
