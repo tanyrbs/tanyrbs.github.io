@@ -1165,12 +1165,20 @@ button:focus-visible {
   color: var(--accent);
 }
 
-/* 标签页里的关于：去掉卡片外观 */
+/* 标签页里的关于：去掉卡片外观，内容居中 */
 .sidebar-pane .profile-panel {
   padding: 0;
   background: transparent;
   box-shadow: none;
+}
+.sidebar-pane[data-pane="about"] {
   text-align: center;
+}
+.sidebar-pane[data-pane="about"] .avatar {
+  margin: 0 auto 12px;
+}
+.sidebar-pane[data-pane="about"] .profile-affiliation {
+  margin: 4px 0 16px;
 }
 
 /* 宽屏时目录在侧栏，文章内的目录只在窄屏出现 */
