@@ -8,11 +8,6 @@
   <meta name="theme-color" content="#111214">
   <meta name="color-scheme" content="light dark">
   <link rel="canonical" href="{{ .Permalink }}">
-  {{ range .Translations }}
-    <link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}">
-  {{ end }}
-  <link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}">
-  <link rel="alternate" hreflang="x-default" href="{{ .Permalink }}">
   {{ with .OutputFormats.Get "RSS" }}
     <link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}">
   {{ end }}
@@ -22,6 +17,10 @@
   {{ if eq .Params.articleStyle "lecture" }}
     {{ $lectureCSS := resources.Get "css/lecture.css" | minify | fingerprint }}
     <link rel="stylesheet" href="{{ $lectureCSS.RelPermalink }}" integrity="{{ $lectureCSS.Data.Integrity }}">
+  {{ end }}
+  {{ if .Params.latex }}
+    {{ $noteCSS := resources.Get "css/latex-note.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ $noteCSS.RelPermalink }}" integrity="{{ $noteCSS.Data.Integrity }}">
   {{ end }}
   {{ $js := resources.Get "js/site.js" | minify | fingerprint }}
   <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>

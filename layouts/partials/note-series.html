@@ -1,0 +1,17 @@
+{{ $current := . }}
+{{ with .Params.lectureSeries }}
+  {{ $pages := where site.RegularPages "Params.lectureSeries" . }}
+  {{ $pages = sort $pages "Params.lectureNumber" }}
+  {{ if gt (len $pages) 1 }}
+    <nav class="note-series" data-pagefind-ignore aria-label="{{ i18n "noteSeries" }}">
+      <p class="note-series-title">{{ . }}</p>
+      <ol>
+        {{ range $pages }}
+          <li{{ if eq .RelPermalink $current.RelPermalink }} aria-current="page"{{ end }}>
+            <a href="{{ .RelPermalink }}">{{ with .Params.lectureNumber }}第 {{ . }} 讲 · {{ end }}{{ .Title }}</a>
+          </li>
+        {{ end }}
+      </ol>
+    </nav>
+  {{ end }}
+{{ end }}

@@ -1,67 +1,85 @@
 # tanyrbs.github.io
 
-Personal site and blog powered by Hugo, GitHub Actions, and GitHub Pages.
+个人站点：Hugo 打站点外壳，笔记用 LaTeX 写、构建时编译成网页。
 
-## Write a post
+## 内容从哪来
 
-English posts go in `content/en/blog/`; Chinese posts go in `content/zh-cn/blog/`.
+| 目录 | 是什么 |
+|---|---|
+| `latex/<slug>/main.tex` | 笔记源文件（就是 Overleaf 里的那份），**唯一内容源** |
+| `latex/<slug>/preamble.tex` | 该笔记的导言区（ctexart + amsmath + thmtools） |
+| `content/blog/*.md` | 手写的短文（Markdown） |
+| `content/notes/<slug>/index.md` | 由脚本生成，只有 frontmatter，不要手改 |
+| `assets/notes/<slug>/body.html` | 由脚本生成，编译后的正文 |
+| `layouts/`、`assets/css` | 站点外壳与样式 |
 
-Create a Markdown file like this:
+## 写一篇新笔记
 
-```markdown
----
-title: "Post Title"
-date: 2026-05-27T10:00:00+08:00
-draft: false
-tags: ["notes"]
-categories: ["research"]
-description: "Short SEO description."
-summary: "Short summary shown on the blog index."
----
+1. 新建 `latex/<slug>/`，放 `main.tex` 和 `preamble.tex`（可以从别的笔记复制）。
+2. 在 `main.tex` **最前面**加元数据注释（不影响 Overleaf 编译）：
 
-Post content goes here.
+```latex
+%! title: 梯度、策略梯度与 PPO
+%! date: 2026-10-25
+%! slug: rl-ppo
+%! series: 强化学习
+%! number: 1
+%! tags: 强化学习, PPO, 策略梯度
+%! description: 一句话摘要，用于列表和搜索。
 ```
 
-To link translations, give matching posts the same `translationKey`.
+3. 本地跑 `npm run notes`，再 `npm run site`，或者一步到位 `npm run publish`。
 
-## Draft from Obsidian
+## 常用命令
 
-Keep your vault as the writing workspace, then copy only notes you intend to publish into `content/en/blog/` or `content/zh-cn/blog/`. Add the front matter above before publishing. Store public images with the post or under `static/`; avoid pointing published pages at files elsewhere in a private vault.
-
-Math can use `$...$` inline or `$$...$$` on separate lines. Posts tagged with `articleStyle: "lecture"` use the bundled lecture-note layout and can use the `lecture-box` shortcode. The article index groups published posts by year, and the categories page is generated from published posts' `categories` front matter.
-
-## Local preview
-
-Install Hugo Extended, then run:
-
-```powershell
-hugo server -D
+```bash
+npm run notes      # 编译所有 .tex + KaTeX 渲染正文，生成 content/notes 与 assets/notes
+npm run site       # hugo --minify --gc
+npm run search     # pagefind 建搜索索引
+npm run publish    # notes + site + search
 ```
 
-This workspace also has a downloaded Hugo binary at:
+本地预览：`npm run notes && hugo server -D`
+
+## 依赖
+
+- **Hugo Extended 0.162+**
+- **Node 20+**（跑 `scripts/latex/*.mjs`，KaTeX 通过 npm 安装）
+- **TeX Live**（含 `make4ht` / tex4ht）。中文必须走 LuaLaTeX——`make4ht -l`，用 XeLaTeX 模式会**静默丢中文**。
+
+Windows 上 Hugo 不在 PATH 时可以这样：
 
 ```powershell
 D:\00_project\005blog\tools\hugo\hugo.exe server -D
 ```
 
-Build and generate the search index:
+## 构建管线
 
-```powershell
-D:\00_project\005blog\tools\hugo\hugo.exe --minify --gc
-npx -y pagefind --site public
+```
+latex/<slug>/main.tex
+      │  make4ht -l -f html5 ... "mathjax"      （TeX 引擎，中文走 LuaLaTeX）
+      ▼
+latex-out/<slug>/body.raw.html
+      │  scripts/latex/postprocess.mjs
+      │    · 修 tex4ht + ctex 的畸形标题标签
+      │    · 用 KaTeX 把 \(...\) / \[...\] 渲染成 MathML（构建期，页面零 JS）
+      │    · 生成目录、frontmatter、git 最后更新时间
+      ▼
+content/notes/<slug>/index.md + assets/notes/<slug>/body.html
+      │  hugo
+      ▼
+public/  →  pagefind  →  GitHub Pages
 ```
 
 ## GitHub Pages
 
-The workflow in `.github/workflows/pages.yml` builds the site and deploys `public/` to GitHub Pages.
+`.github/workflows/pages.yml` 分两个 job：
 
-In the repository settings, set **Pages > Build and deployment > Source** to **GitHub Actions**.
+1. `notes`：跑在 `texlive/texlive:latest` 容器里，把每篇 `.tex` 编译成 HTML 片段。
+2. `build`：装依赖 → KaTeX 渲染 → Hugo → Pagefind → 上传 artifact → 部署。
 
-## Comments
+仓库设置里 **Pages > Build and deployment > Source** 选 **GitHub Actions**。
 
-Giscus is wired into the templates but disabled by default. To enable it:
+## 评论
 
-1. Enable GitHub Discussions for the repository.
-2. Install the giscus app for the repository.
-3. Fill `params.giscus.repoId` and `params.giscus.categoryId` in `hugo.toml`.
-4. Set `params.giscus.enabled = true`.
+Giscus 已接好但默认关闭。开启方法：仓库启用 Discussions、安装 giscus app，再把 `hugo.toml` 里 `params.giscus.repoId` / `categoryId` 填上并设 `enabled = true`。

@@ -1,7 +1,8 @@
 ---
 title: "关于谭浩陶"
 description: "谭浩陶，华东理工大学"
-url: "/zh-cn/about/"
+url: "/about/"
+aliases: ["/zh-cn/about/"]
 translationKey: "about"
 ---
 

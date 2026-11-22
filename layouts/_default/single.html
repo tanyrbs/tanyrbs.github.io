@@ -1,12 +1,16 @@
 {{ define "main" }}
   {{ $lecture := eq .Params.articleStyle "lecture" }}
-  <article class="article-surface{{ if $lecture }} lecture-article{{ end }}">
+  {{ $latex := .Params.latex }}
+  {{ $isNote := eq .Section "notes" }}
+  {{ $slug := .Params.slug | default .File.ContentBaseName }}
+  {{ $slug := .Params.slug | default .File.ContentBaseName }}
+  <article class="article-surface{{ if $lecture }} lecture-article{{ end }}" data-pagefind-body>
     <header class="article-header{{ if $lecture }} lecture-banner{{ end }}">
       {{ if $lecture }}
         <div class="lecture-kicker">
           <span>{{ .Params.lectureSeries }}</span>
           {{ with .Params.lectureNumber }}
-            <span>{{ if eq $.Language.Lang "zh-cn" }}第 {{ . }} 讲{{ else }}Lecture {{ . }}{{ end }}</span>
+            <span>第 {{ . }} 讲</span>
           {{ end }}
         </div>
       {{ end }}
@@ -14,34 +18,57 @@
       {{ if $lecture }}
         {{ with .Params.subtitle }}<p class="lecture-subtitle">{{ . }}</p>{{ end }}
       {{ end }}
-      {{ if eq .Section "blog" }}
+      {{ if or (eq .Section "blog") $isNote }}
         {{ partial "post-meta.html" . }}
       {{ end }}
     </header>
-    {{ if and site.Params.showToc .TableOfContents (eq .Section "blog") }}
+
+    {{ if $latex }}{{ partial "latex-toolbar.html" . }}{{ end }}
+
+    {{ if $latex }}
+      {{ if $isNote }}{{ partial "note-series.html" . }}{{ end }}
+      {{ with os.ReadFile (path.Join "assets" "notes" $slug "toc.html") }}
+        <details class="toc lecture-toc" data-pagefind-ignore open>
+          <summary>{{ i18n "tableOfContents" }}</summary>
+          {{ . | safeHTML }}
+        </details>
+      {{ end }}
+    {{ else if and site.Params.showToc .TableOfContents (eq .Section "blog") }}
       {{ if $lecture }}
-        <details class="toc lecture-toc">
+        <details class="toc lecture-toc" data-pagefind-ignore>
           <summary>{{ i18n "tableOfContents" }}</summary>
           {{ .TableOfContents }}
         </details>
       {{ else }}
-      <aside class="toc" aria-labelledby="toc-title">
+      <aside class="toc" aria-labelledby="toc-title" data-pagefind-ignore>
         <h2 id="toc-title">{{ i18n "tableOfContents" }}</h2>
         {{ .TableOfContents }}
       </aside>
       {{ end }}
     {{ end }}
-    <div class="article-content{{ if $lecture }} lecture-content{{ end }}" data-pagefind-body>
-      {{ .Content }}
+
+    <div class="article-content{{ if $lecture }} lecture-content{{ end }}">
+      {{ if $latex }}
+        {{ with os.ReadFile (path.Join "assets" "notes" $slug "body.html") }}
+          {{ . | safeHTML }}
+        {{ else }}
+          <p class="empty-state">{{ i18n "noteBuildMissing" }}</p>
+        {{ end }}
+      {{ else }}
+        {{ .Content }}
+      {{ end }}
     </div>
-    {{ if $lecture }}
-      <p class="lecture-template-credit">{{ i18n "lectureTemplateCredit" }} <a href="https://mistatle.github.io/public/data/templates/cn_lecture_note.md">CN Lecture Note</a>.</p>
-    {{ end }}
+
+    {{ if $latex }}{{ partial "note-footer.html" . }}{{ end }}
+
     {{ if eq .Section "blog" }}
       {{ partial "comments.html" . }}
     {{ end }}
   </article>
-  {{ if eq .Section "blog" }}
+
+  {{ if $isNote }}{{ partial "related-notes.html" . }}{{ end }}
+
+  {{ if or (eq .Section "blog") $isNote }}
     <nav class="article-pagination" aria-label="{{ i18n "articleNavigation" }}">
       {{ with .PrevInSection }}<a href="{{ .RelPermalink }}"><span>{{ i18n "newerPost" }}</span>{{ .LinkTitle }}</a>{{ end }}
       {{ with .NextInSection }}<a href="{{ .RelPermalink }}"><span>{{ i18n "olderPost" }}</span>{{ .LinkTitle }}</a>{{ end }}

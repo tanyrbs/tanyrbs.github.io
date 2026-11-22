@@ -120,3 +120,51 @@ other = "较早文章"
 
 [lectureTemplateCredit]
 other = "讲义版式改编自"
+
+[notes]
+other = "笔记"
+
+[noteCount]
+other = "{{ .Count }} 篇笔记"
+
+[latexSource]
+other = "LaTeX 源码"
+
+[openPdf]
+other = "打开 PDF"
+
+[downloadPdf]
+other = "下载 PDF"
+
+[pdfPreviewUnavailable]
+other = "如果内嵌预览不可用，请"
+
+[pdfMissing]
+other = "PDF 尚未生成。"
+
+[plainTextVersion]
+other = "文字版（便于检索与复制）"
+
+[pdfLoading]
+other = "正在加载 PDF…"
+
+[pdfLoadError]
+other = "PDF 预览加载失败，请使用上方的“打开 PDF”。"
+
+[noteSeries]
+other = "系列"
+
+[relatedNotes]
+other = "相关笔记"
+
+[noteLicense]
+other = "本文用 CC BY-NC-SA 4.0 授权，转载注明出处。"
+
+[noteErrata]
+other = "发现错误？提 PR"
+
+[noteUpdated]
+other = "最后更新于"
+
+[noteBuildMissing]
+other = "这篇笔记的正文还没生成，运行 npm run notes 后重试。"

@@ -1,4 +1,4 @@
-name: Deploy Hugo site to Pages
+name: Deploy Hugo site with LaTeX notes to Pages
 
 on:
   push:
@@ -20,12 +20,34 @@ defaults:
     shell: bash
 
 jobs:
-  build:
+  # 1. 用 TeX Live 官方镜像编译 latex/<slug>/main.tex -> latex-out/
+  notes:
     runs-on: ubuntu-latest
-    env:
-      HUGO_VERSION: 0.162.0
-      HUGO_CACHEDIR: /tmp/hugo_cache
-      TZ: Asia/Shanghai
+    container: texlive/texlive:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Compile LaTeX notes
+        run: node scripts/latex/compile.mjs
+
+      - name: Upload compiled notes
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-out
+          path: latex-out
+
+  # 2. KaTeX 渲染 + Hugo 构建 + Pagefind 索引 + 部署
+  build:
+    needs: notes
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -36,35 +58,34 @@ jobs:
         id: pages
         uses: actions/configure-pages@v6
 
-      - name: Restore Hugo cache
-        uses: actions/cache@v4
+      - name: Download compiled notes
+        uses: actions/download-artifact@v4
         with:
-          path: ${{ env.HUGO_CACHEDIR }}
-          key: hugo-${{ runner.os }}-${{ hashFiles('**/hugo.toml') }}
-          restore-keys: |
-            hugo-${{ runner.os }}-
-
-      - name: Install Hugo
-        run: |
-          curl --fail --silent --location --remote-name "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
-          mkdir -p "${HOME}/.local/hugo"
-          tar -C "${HOME}/.local/hugo" -xf "hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
-          rm "hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
-          echo "${HOME}/.local/hugo" >> "${GITHUB_PATH}"
-
-      - name: Verify Hugo
-        run: hugo version
+          name: latex-out
+          path: latex-out
 
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 24
+          cache: npm
 
-      - name: Build
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Render notes into Hugo content
+        run: node scripts/latex/postprocess.mjs
+
+      - name: Setup Hugo
+        run: |
+          curl --fail --silent --location --remote-name "https://github.com/gohugoio/hugo/releases/download/v0.162.0/hugo_extended_0.162.0_linux-amd64.tar.gz"
+          sudo tar -C /usr/local/bin -xf hugo_extended_0.162.0_linux-amd64.tar.gz hugo
+
+      - name: Build site
         run: hugo --minify --gc --baseURL "${{ steps.pages.outputs.base_url }}/"
 
       - name: Build search index
-        run: npx -y pagefind --site public
+        run: npx -y pagefind@1.6.0 --site public
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5

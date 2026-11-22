@@ -3,6 +3,9 @@
   {{ with site.GetPage "section" "blog" }}
     <a href="{{ .RelPermalink }}"{{ if eq $.Section "blog" }} aria-current="page"{{ end }}>{{ i18n "blog" }}</a>
   {{ end }}
+  {{ with site.GetPage "section" "notes" }}
+    <a href="{{ .RelPermalink }}"{{ if eq $.Section "notes" }} aria-current="page"{{ end }}>{{ i18n "notes" }}</a>
+  {{ end }}
   {{ with site.GetPage "/archives" }}
     <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "archives" }}</a>
   {{ end }}

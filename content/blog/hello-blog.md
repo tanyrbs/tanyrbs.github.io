@@ -1,4 +1,5 @@
 ---
+aliases: ["/zh-cn/blog/2026/05/hello-blog/"]
 title: "博客上线"
 date: 2026-05-27T10:00:00+08:00
 lastmod: 2026-05-28T10:00:00+08:00

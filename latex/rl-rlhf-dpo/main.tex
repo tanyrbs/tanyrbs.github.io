@@ -1,0 +1,228 @@
+%! title: RLHF 与 DPO：从偏好模型到直接优化
+%! date: 2026-10-26
+%! slug: rl-rlhf-dpo
+%! series: 强化学习
+%! number: 2
+%! tags: 强化学习, RLHF, DPO, 对齐
+%! description: 先走一遍 RLHF 三步，再完整推一遍 DPO：求 PPO 的最优解、反解奖励、代入偏好 loss，看 Z(x) 如何抵消。
+\documentclass[UTF8,fontset=fandol]{ctexart}
+
+\input{preamble}
+
+\title{RLHF笔记}
+\author{THT}
+\date{2026.10.26}
+
+\begin{document}
+\maketitlecolored
+
+\section{RLHF}
+
+RLHF（Reinforcement Learning from Human Feedback，基于人类反馈的强化学习），指的是在强化学习这一框架下，用人类偏好作为最终的学习标准（奖励）。常见有三步：SFT \(\rightarrow\) 训练奖励模型（RM）\(\rightarrow\) 强化学习算法优化（PPO）。
+
+\subsection{第一步：SFT}
+
+用高质量示范数据微调预训练模型，得到初始策略 \(\pi_{\text{SFT}}\)。它是后面两步的起点：强化学习阶段的参考模型通常就取 \(\pi_{\text{ref}} = \pi_{\text{SFT}}\)，待训练的策略 \(\pi_\theta\) 也从 \(\pi_{\text{SFT}}\) 初始化。
+
+\subsection{第二步：训练奖励模型（RM）}
+
+对同一个 prompt \(x\)，让人标注两个答案中哪个更好，例如 \(y_w \succ y_l\)（表示 \(y_w\) 比 \(y_l\) 好，下文记作 \(y_{\text{win}}\) 和 \(y_{\text{lose}}\)），由此得到偏好数据集 \(\mathcal{D} = \{(x, y_{\text{win}}, y_{\text{lose}})\}\)。奖励模型的训练目标是：
+\[
+\max_{r_\phi} \left\{ \mathbb{E}_{(x, y_{\text{win}}, y_{\text{lose}}) \sim \mathcal{D}} \left[ \log \sigma (r_\phi(x, y_{\text{win}}) - r_\phi(x, y_{\text{lose}})) \right] \right\}
+\]
+
+其中 \(r_\phi\) 就是 reward model，用来给回答打分（输入 prompt 和回答，输出一个标量分数）。\(\sigma(z) = \frac{1}{1 + e^{-z}}\) 是 sigmoid 函数，\(\mathcal{D}\) 是训练数据集，\(x\) 是 prompt，\(y_{\text{win}}\) 和 \(y_{\text{lose}}\) 分别是好的回答和不好的回答。也就是说，要尽可能让好的回答的得分比不好的回答高，拉大他们之间的差别。
+
+\textbf{这个 loss 从哪来？}它来自 Bradley--Terry 偏好模型：假设 \(y_{\text{win}}\) 胜过 \(y_{\text{lose}}\) 的概率由两者的得分决定，
+\[
+P(y_{\text{win}} \succ y_{\text{lose}} \mid x)
+= \frac{e^{r_\phi(x, y_{\text{win}})}}{e^{r_\phi(x, y_{\text{win}})} + e^{r_\phi(x, y_{\text{lose}})}}
+= \sigma\big(r_\phi(x, y_{\text{win}}) - r_\phi(x, y_{\text{lose}})\big)
+\]
+对偏好数据做极大似然估计（最大化 \(\log P\)），就得到上面的训练目标。
+
+\textbf{注意：}这个 loss 只依赖同一个 \(x\) 下两个回答的\textbf{得分差}。给 \(r_\phi(x, y)\) 加上任意一个只和 \(x\) 有关的项 \(f(x)\)，loss 完全不变。这是后面 DPO 推导中能消掉 \(Z(x)\) 的关键。
+
+\subsection{第三步：强化学习算法优化（PPO）}
+
+固定训练好的奖励模型 \(r_\phi\)，用强化学习来优化 LLM：在最大化奖励的同时，不让模型偏离参考模型（通常是 SFT 模型）太远：
+\[
+\max_{\pi_\theta} \left\{ \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_\theta(y|x)} \left[ r_\phi(x, y) \right] - \beta\, \mathbb{D}_{\mathrm{KL}} \left[ \pi_\theta(y|x) \parallel \pi_{\text{ref}}(y|x) \right] \right\}
+\]
+
+其中 \(\pi_\theta\) 是我们在训练的 LLM，\(\pi_{\text{ref}}\) 是训练的初始值（参考模型，训练过程中参数冻结），\(\beta > 0\) 控制 KL 惩罚的力度。这个 loss 意思是希望 LLM 输出的回答的评分能尽可能高，同时 \(\pi_\theta\) 不要偏离 \(\pi_{\text{ref}}\) 太多，保证它还能正常做回答，不要训成一个评分很高但是回答乱码的东西。
+
+这个目标通常用 PPO 算法来优化，所以下文也把它叫作“PPO 的 loss 函数”（严格来说，它是 RLHF 第三步的优化目标，PPO 是求解它的一种算法）。
+
+\section{DPO}
+
+\subsection{动机与整体思路}
+
+RLHF 的后两步代价很高：要先单独训练一个奖励模型；PPO 阶段还要不断用 \(\pi_\theta\) 在线采样、用奖励模型打分，同时维护策略、价值（critic）、奖励、参考四个模型，训练复杂且不稳定。
+
+DPO（Direct Preference Optimization，直接偏好优化）的目标是：\textbf{省略训练奖励模型这个步骤（也不再需要强化学习），直接用偏好数据一步到位来训练对齐模型}。推导分三步：
+\begin{enumerate}
+  \item \textbf{推导一}：求出 PPO 的 loss 的最优解 \(\pi^*\)，它可以用 \(\pi_{\text{ref}}\) 和 \(r_\phi\) 显式写出来；
+  \item \textbf{推导二}：反过来，用 \(\pi^*\) 表示奖励函数 \(r\)；
+  \item \textbf{推导三}：把这个 \(r\) 代入奖励模型的 loss，难算的归一化项 \(Z(x)\) 恰好抵消，得到只含 \(\pi_\theta\) 和 \(\pi_{\text{ref}}\) 的 DPO loss。
+\end{enumerate}
+
+\subsection{推导一：求 PPO 的 loss 的最优解 \texorpdfstring{\(\pi^*\)}{pi*}}
+
+先回顾 KL 散度。KL 的定义是：
+\[
+\mathbb{D}_{\mathrm{KL}}(p \parallel q) = \mathbb{E}_{y \sim p} \left[ \log \frac{p(y)}{q(y)} \right]
+\]
+它衡量两个分布的差异，并且总有 \(\mathbb{D}_{\mathrm{KL}}(p \parallel q) \ge 0\)，当且仅当 \(p = q\) 时等于 0。
+
+针对于 RLHF 的第三步，强化学习算法优化的 loss 函数，我们可以有以下改造：
+\begin{itemize}
+\item 代入 KL 散度得（按定义把 KL 写成期望，和奖励项合并成同一个期望，\(y \sim \pi_\theta(y|x)\) 提取放到了左下角）：
+\[
+\max_{\pi_\theta} \left\{ \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_\theta(y|x)} \left[ r_\phi(x, y) - \beta \log \frac{\pi_\theta(y|x)}{\pi_{\text{ref}}(y|x)} \right] \right\}
+\]
+
+\item 乘上 \(-\frac{1}{\beta}\)，把 max 变成 min 得：
+\[
+\min_{\pi_\theta} \left\{ \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_\theta(y|x)} \left[ \log \frac{\pi_\theta(y|x)}{\pi_{\text{ref}}(y|x)} - \frac{1}{\beta} r_\phi(x, y) \right] \right\}
+\]
+
+\item 等价变换得（把 \(\frac{1}{\beta} r_\phi(x, y)\) 写成 \(\log e^{\frac{1}{\beta} r_\phi(x, y)}\)）：
+\[
+\min_{\pi_\theta} \left\{ \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_\theta(y|x)} \left[ \log \frac{\pi_\theta(y|x)}{\pi_{\text{ref}}(y|x)} - \log e^{\frac{1}{\beta} r_\phi(x, y)} \right] \right\}
+\]
+
+\item 根据 \(\log(\frac{A}{B}) = \log A - \log B\) 得：
+\[
+\min_{\pi_\theta} \left\{ \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_\theta(y|x)} \left[ \log \frac{\pi_\theta(y|x)}{\pi_{\text{ref}}(y|x) e^{r_\phi(x, y)/\beta}} \right] \right\}
+\]
+\end{itemize}
+
+找最小值点有个常用技巧：把式子凑成一个“最小值在哪一眼就能看出”的形式。
+\begin{itemize}
+\item 变量是普通的数 \(x\) 时：\((x - a)^2 \ge 0\)，在 \(x = a\) 处最小，这就是配方法。
+\item 变量是概率分布 \(p\) 时：\(\mathbb{D}_{\mathrm{KL}}(p \parallel q) \ge 0\)，在 \(p = q\) 处最小（等于 0）。
+\end{itemize}
+这里的变量是概率分布 \(\pi_\theta\)，所以我们想把上面最后一个式子凑成 KL 散度，也就是让 log 里面变成“分布 / 分布”。
+
+对上述式子，我们发现分子的概率之和恒等于 1（\(\sum_y \pi_\theta(y|x) = 1\)），分母的概率之和不等于 1（\(\pi_{\text{ref}}(y|x) e^{r_\phi(x,y)/\beta}\) 不是一个概率分布），所以还不能直接写成 KL 散度。
+
+为此进行分母归一化，为的是保证分布的概率和等于 1。不妨令分母
+\[
+Z(x) = \sum_{y} \pi_{\text{ref}}(y|x) e^{r_\phi(x,y)/\beta}
+\]
+定义
+\[
+\pi^*(y|x) = \frac{\pi_{\text{ref}}(y|x) e^{r_\phi(x,y)/\beta}}{Z(x)}
+\]
+其中，\(\pi^*(y|x)\) 的概率之和为 1（\(\sum_y \pi^*(y|x) = Z(x)/Z(x) = 1\)），是一个合法的概率分布。注意 \(Z(x)\) 只和 \(x\)、\(\pi_{\text{ref}}\)、\(r_\phi\) 有关，和我们要优化的 \(\pi_\theta\) 无关。
+
+带回去得：
+\begin{itemize}
+\item 继续对 ppo 的 loss 函数等价变换（分母先除以、再乘以 \(Z(x)\)）得：
+\[
+\min_{\pi_\theta} \mathbb{E}_{x\sim\mathcal{D},y\sim\pi_\theta(y|x)} \left[ \log \frac{\pi_\theta(y|x)}{ \frac{\pi_{\text{ref}}(y|x)e^{r_\phi(x,y)/\beta}}{Z(x)} Z(x) } \right]
+\]
+
+\item 化简得：
+\[
+\min_{\pi_\theta} \mathbb{E}_{x\sim\mathcal{D},y\sim\pi_\theta(y|x)} \left[ \log \frac{\pi_\theta(y|x)}{\pi^*(y|x)} - \log Z(x) \right]
+\]
+
+\item 由于 \(\pi_\theta\) 和 \(Z(x)\) 完全没有关系，可以省略，得：
+\[
+\min_{\pi_\theta} \mathbb{E}_{x\sim\mathcal{D},y\sim\pi_\theta(y|x)} \left[ \log \frac{\pi_\theta(y|x)}{\pi^*(y|x)} \right]
+\]
+
+\item 代入 KL 散度得（左下角的 \(y \sim \pi_\theta(y|x)\) 没有了）：
+\[
+\min_{\pi_\theta} \mathbb{E}_{x\sim\mathcal{D}} \left[ \mathbb{D}_{\mathrm{KL}} \big(\pi_\theta(y|x) \parallel \pi^*(y|x)\big) \right]
+\]
+\end{itemize}
+
+由于 KL 散度的非负性质，\(\pi_\theta(y|x)\) 的最优解就是 \(\pi^*(y|x)\)，PPO 的最优概率分布就是 \(\pi^*\)：
+\[
+\boxed{\pi^*(y|x) = \frac{1}{Z(x)}\, \pi_{\text{ref}}(y|x)\, e^{r_\phi(x,y)/\beta}}
+\]
+
+也就是说，在已知 Reward\_model 的参数 \(r_\phi\) 的情况下，我们可以求得 PPO 的最优解 \(\pi^*\)。
+
+\subsection{为什么不能直接用这个显式解？}
+
+我们现在得到了对齐模型 \(\pi\) 的显式解 \(\pi^*(y|x)\)（有的资料记作 \(\pi_r(y|x)\)，强调它由奖励 \(r\) 决定），但是我们却很难直接利用起这个显式解形式，原因如下：
+\begin{enumerate}
+\item \(Z(x)\) 的值很难估计。根据 \(Z(x)\) 的形式可知，想要估计它，需要对一个 prompt \(x\) 采样足够多的回答 \(y\)（严格来说要对所有可能的回答求和，而回答的数量随长度指数增长）。这个代价是十分昂贵的。
+\item 同时回顾最开始我们的目标：省略训练奖励模型这个步骤，一步到位来训练对齐模型。而目前我们得到的 \(\pi\) 的显式解仍然需要一个确定的奖励函数 \(r\)，没有达到我们的目标。
+\end{enumerate}
+
+\subsection{推导二：用 \texorpdfstring{\(\pi^*\)}{pi*} 反过来表示奖励函数 \texorpdfstring{\(r\)}{r}}
+
+所以现在我们继续来迭代。基于上述第 2 个原因，我们可以先从 \(\pi\) 的显式解中推出奖励函数 \(r\) 的形式：
+\[
+r^*(x, y) = \beta \log \frac{\pi^*(y|x)}{\pi_{\text{ref}}(y|x)} + \beta \log Z(x)
+\]
+这里的 \(r^*\) 指 \(\pi^*\) 所对应的奖励函数（也就是推导一里的 \(r_\phi\)）。推导如下：
+
+转换一下 \(\pi^*\) 的定义式可以得到：
+\[
+\frac{\pi^*(y|x)Z(x)}{\pi_{\text{ref}}(y|x)} = e^{r_\phi(x,y)/\beta}
+\]
+两边取对数、再乘以 \(\beta\)，等价变换得：
+\[
+r_\phi(x,y) = \beta \log \frac{\pi^*(y|x)Z(x)}{\pi_{\text{ref}}(y|x)} = \beta \log \frac{\pi^*(y|x)}{\pi_{\text{ref}}(y|x)} + \beta \log Z(x)
+\]
+
+这个式子说明：奖励函数可以完全用它对应的最优策略 \(\pi^*\) 和参考模型 \(\pi_{\text{ref}}\) 来表示。于是可以反过来想：不必先训练奖励模型再求 \(\pi^*\)，而是直接用可训练的 \(\pi_\theta\) 来充当 \(\pi^*\)，它自己就隐式地定义了一个奖励（这就是 DPO 论文标题 \emph{Your Language Model is Secretly a Reward Model} 的含义）。剩下的麻烦只有 \(Z(x)\)，下一步会看到它被自动消掉。
+
+\subsection{推导三：代入奖励模型的 loss，得到 DPO loss}
+
+把 \(r_\phi(x,y)\) 的等价表达代入到 Reward\_model 的 loss 函数：
+\[
+\begin{aligned}
+& \text{reward-model-loss} \\
+=\ & \max_{\pi^*} \Bigg\{ \mathbb{E}_{(x,y_{\text{win}},y_{\text{lose}})\sim\mathcal{D}} \Bigg[ \log \sigma \Bigg( \beta \log \frac{\pi^*(y_{\text{win}}|x)}{\pi_{\text{ref}}(y_{\text{win}}|x)} + \beta \log Z(x) \\
+& \qquad\qquad - \beta \log \frac{\pi^*(y_{\text{lose}}|x)}{\pi_{\text{ref}}(y_{\text{lose}}|x)} - \beta \log Z(x) \Bigg) \Bigg] \Bigg\} \\
+=\ & \max_{\pi_\theta} \left\{ \mathbb{E}_{(x,y_{\text{win}},y_{\text{lose}})\sim\mathcal{D}} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(y_{\text{win}}|x)}{\pi_{\text{ref}}(y_{\text{win}}|x)} - \beta \log \frac{\pi_\theta(y_{\text{lose}}|x)}{\pi_{\text{ref}}(y_{\text{lose}}|x)} \right) \right] \right\} \\
+=\ & \text{dpo-loss}
+\end{aligned}
+\]
+
+这两个等号的含义：
+\begin{itemize}
+\item 第一个等号：把 \(r(x, y_{\text{win}})\) 和 \(r(x, y_{\text{lose}})\) 都换成推导二得到的表达式。由于同一个 \(x\) 下的两个回答共享同一个 \(Z(x)\)，\(+\beta \log Z(x)\) 和 \(-\beta \log Z(x)\) 正好抵消，难以估计的 \(Z(x)\) 消失了（解决了上面的原因 1）。
+\item 第二个等号：由推导一和推导二，奖励 \(r\) 和最优策略 \(\pi^*\) 可以互相表示，所以“在所有奖励函数里找最好的 \(r\)”等价于“在所有策略里找最好的 \(\pi^*\)”；再用可训练的 \(\pi_\theta\) 来代替 \(\pi^*\)，loss 里就只剩 \(\pi_\theta\) 和 \(\pi_{\text{ref}}\)，不再需要奖励模型（解决了上面的原因 2）。
+\end{itemize}
+
+实际训练时，通常把它写成最小化的形式（取负号）：
+\[
+\boxed{\mathcal{L}_{\text{DPO}}(\pi_\theta; \pi_{\text{ref}}) = -\mathbb{E}_{(x, y_{\text{win}}, y_{\text{lose}}) \sim \mathcal{D}} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(y_{\text{win}}|x)}{\pi_{\text{ref}}(y_{\text{win}}|x)} - \beta \log \frac{\pi_\theta(y_{\text{lose}}|x)}{\pi_{\text{ref}}(y_{\text{lose}}|x)} \right) \right]}
+\]
+
+\textbf{直观理解：}记隐式奖励 \(\hat{r}_\theta(x, y) = \beta \log \frac{\pi_\theta(y|x)}{\pi_{\text{ref}}(y|x)}\)，DPO loss 就是把奖励模型 loss 里的 \(r_\phi\) 换成了这个隐式奖励。它的梯度为
+\[
+\nabla_\theta \mathcal{L}_{\text{DPO}} = -\beta\, \mathbb{E}\Big[ \sigma\big(\hat{r}_\theta(x, y_{\text{lose}}) - \hat{r}_\theta(x, y_{\text{win}})\big) \big( \nabla_\theta \log \pi_\theta(y_{\text{win}}|x) - \nabla_\theta \log \pi_\theta(y_{\text{lose}}|x) \big) \Big]
+\]
+即：提高好回答 \(y_{\text{win}}\) 的概率、降低差回答 \(y_{\text{lose}}\) 的概率；当隐式奖励把两者排反了（\(\hat{r}_\theta(x, y_{\text{lose}}) > \hat{r}_\theta(x, y_{\text{win}})\)）时，权重 \(\sigma(\cdot)\) 更大，更新幅度也更大。训练时只需要 \(\pi_\theta\) 和冻结的 \(\pi_{\text{ref}}\) 分别算出两个回答的 log 概率，不需要奖励模型，也不需要在线采样。
+
+\subsection{小结：三个 loss 对照参考}
+
+\begin{align*}
+&\textbf{reward\_model loss} \\
+&\qquad \max_{r_\phi} \left\{ \mathbb{E}_{(x, y_{\text{win}}, y_{\text{lose}}) \sim \mathcal{D}} \left[ \log \sigma (r_\phi(x, y_{\text{win}}) - r_\phi(x, y_{\text{lose}})) \right] \right\} \\[15pt]
+&\textbf{ppo loss} \\
+&\qquad \max_{\pi_\theta} \left\{ \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_\theta(y|x)} \left[ r_\phi(x, y) \right] - \beta \mathbb{D}_{\mathrm{KL}} \left[ \pi_\theta(y|x) \parallel \pi_{\text{ref}}(y|x) \right] \right\} \\[15pt]
+&\textbf{dpo loss} \\
+&\qquad \max_{\pi_\theta} \left\{ \mathbb{E}_{(x, y_{\text{win}}, y_{\text{lose}}) \sim \mathcal{D}} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(y_{\text{win}}|x)}{\pi_{\text{ref}}(y_{\text{win}}|x)} - \beta \log \frac{\pi_\theta(y_{\text{lose}}|x)}{\pi_{\text{ref}}(y_{\text{lose}}|x)} \right) \right] \right\}
+\end{align*}
+
+对比可见：dpo loss 和 reward\_model loss 的形式完全一样，只是把 \(r_\phi(x, y)\) 换成了 \(\beta \log \frac{\pi_\theta(y|x)}{\pi_{\text{ref}}(y|x)}\)（\(\beta \log Z(x)\) 已抵消）。理想情况下（数据足够多、模型表达能力足够强），它和“先训练奖励模型、再用 PPO 优化”得到的是同一个最优策略，但既不需要奖励模型，也不需要强化学习。
+
+\section{参考}
+
+\begin{enumerate}
+\item \url{https://zhuanlan.zhihu.com/p/671780768}
+\item \url{https://zhuanlan.zhihu.com/p/1082394115}
+\item \url{https://zhuanlan.zhihu.com/p/721073733}
+\item Rafailov R, Sharma A, Mitchell E, et al. Direct Preference Optimization: Your Language Model is Secretly a Reward Model. NeurIPS 2023. \url{https://arxiv.org/abs/2305.18290}
+\end{enumerate}
+\end{document}

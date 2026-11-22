@@ -1,0 +1,512 @@
+﻿%! title: 梯度、策略梯度与 PPO
+%! date: 2026-10-25
+%! slug: rl-ppo
+%! series: 强化学习
+%! number: 1
+%! tags: 强化学习, PPO, 策略梯度, GAE
+%! description: 从导数与梯度出发，推导策略梯度、优势函数、Actor-Critic、重要性采样与 GAE，最后落到 TRPO 与 PPO 的 clip 目标。
+\documentclass[UTF8,fontset=fandol]{ctexart}
+
+\input{preamble}
+
+\title{强化学习梯度与ppo笔记}
+\author{THT}
+\date{2026.10.25}
+
+\begin{document}
+\maketitlecolored
+
+\section{梯度与导数}
+
+\subsection{导数}
+
+函数 $f$ 在点 $x$ 处的导数定义为
+\[
+f'(x)=\lim_{h\to 0}\frac{f(x+h)-f(x)}{h}
+\]
+其中 $\dfrac{f(x+h)-f(x)}{h}$ 是曲线上两点 $(x,f(x))$ 与 $(x+h,f(x+h))$ 连线（割线）的斜率。当 $h\to 0$ 时，割线趋于切线，所以 $f'(x)$ 就是曲线在 $x$ 处切线的斜率，也就是函数在该点的变化率。
+
+当 $h$ 很小时，
+\[
+f(x+h)\approx f(x)+f'(x)\,h
+\]
+即在 $x$ 附近，曲线可以用切线近似：输入变化 $h$，输出大约变化 $f'(x)\,h$。
+
+只有一个自变量时，只能沿 $x$ 轴向左或向右移动：$f'(x)>0$ 时向右函数增大，$f'(x)<0$ 时向左函数增大，$|f'(x)|$ 表示变化的快慢。自变量变多后，各个方向的变化率组成一个向量，即梯度。
+
+\subsection{多元函数：偏导数组成梯度}
+
+对二元函数 $f(x,y)$，$\dfrac{\partial f}{\partial x}$ 是只沿 $x$ 方向移动时的变化率，$\dfrac{\partial f}{\partial y}$ 是只沿 $y$ 方向移动时的变化率。同时移动一小步 $(\Delta x,\Delta y)$ 时，
+\[
+\Delta f\approx\frac{\partial f}{\partial x}\Delta x+\frac{\partial f}{\partial y}\Delta y=\nabla f\cdot(\Delta x,\Delta y)
+\]
+其中
+\[
+\nabla f=\left(\frac{\partial f}{\partial x},\frac{\partial f}{\partial y}\right)
+\]
+就是梯度。几何上，函数在该点附近可以用切平面近似，梯度描述了这个切平面的倾斜方向和陡峭程度。
+
+\subsection{方向导数：梯度方向上升最快}
+
+沿单位向量 $\vec{u}$（$\|\vec{u}\|=1$）移动时，函数的变化率（方向导数）为
+\[
+D_{\vec{u}}f=\nabla f\cdot\vec{u}=\|\nabla f\|\,\|\vec{u}\|\cos\theta=\|\nabla f\|\cos\theta
+\]
+其中 $\theta$ 是 $\vec{u}$ 与 $\nabla f$ 的夹角。因此：
+\begin{itemize}
+  \item $\theta=0$（沿梯度方向）：$\cos\theta=1$，变化率取最大值 $\|\nabla f\|$，函数上升最快；
+  \item $\theta=\pi/2$（垂直于梯度，即沿等高线）：变化率为 $0$；
+  \item $\theta=\pi$（沿负梯度方向）：函数下降最快，这就是梯度下降沿 $-\nabla f$ 更新的原因。
+\end{itemize}
+这里的“最快”是局部的：在当前点沿各个方向走同样长的一小步，沿梯度方向函数值增加最多。走远之后梯度会改变，所以梯度上升（下降）每次只走一小步，并在新位置重新计算梯度。
+
+\section{强化学习方法}
+
+\subsection{Policy-based}
+
+在给定状态下，策略给出各个动作的概率。我们要优化策略，使它更倾向于选择好的动作，从而获得更高的回报。
+
+\subsubsection{符号定义}
+
+\begin{itemize}
+  \item $\tau=(s_0,a_0,s_1,a_1,\dots,s_T)$：一条轨迹。
+  \item $\pi_\theta(\cdot\mid s_t)$：随机策略，即状态 $s_t$ 下动作的概率分布；$\pi_\theta(a_t\mid s_t)$ 是选择动作 $a_t$ 的概率，$\theta$ 为策略参数。
+  \item $P(s_{t+1}\mid s_t,a_t)$：状态转移概率，即在 $s_t$ 执行 $a_t$ 后转移到 $s_{t+1}$ 的概率。它由环境决定，与 $\theta$ 无关。
+  \item $r_t=r(s_t,a_t,s_{t+1})$：在 $s_t$ 执行 $a_t$ 并转移到 $s_{t+1}$ 时获得的即时奖励。
+  \item $R(\tau)$：轨迹的累计折扣奖励（回报），$\gamma\in(0,1]$ 为折扣因子：
+  \[
+  R(\tau)=\sum_{t=0}^{T-1}\gamma^t r_t
+  \]
+  \item $P(\tau\mid\pi_\theta)$：在策略 $\pi_\theta$ 下产生轨迹 $\tau$ 的概率，$\rho_0(s_0)$ 为初始状态是 $s_0$ 的概率：
+  \[
+  P(\tau\mid\pi_\theta)=\rho_0(s_0)\prod_{t=0}^{T-1}\pi_\theta(a_t\mid s_t)\,P(s_{t+1}\mid s_t,a_t)
+  \]
+\end{itemize}
+
+\subsubsection{优化目标}
+
+策略的好坏用期望回报衡量：
+\[
+J(\pi_\theta)=\mathbb{E}_{\tau\sim\pi_\theta}\big[R(\tau)\big]=\sum_{\tau}P(\tau\mid\pi_\theta)\,R(\tau)
+\]
+$J(\pi_\theta)$ 是按策略 $\pi_\theta$ 采样轨迹时回报的期望，即所有轨迹回报按概率加权的平均。优化目标是找到使它最大的参数：
+\[
+\theta^*=\arg\max_{\theta}J(\pi_\theta)
+\]
+
+\subsubsection{策略梯度}
+
+用梯度上升求解，需要计算
+\[
+\nabla_\theta J(\pi_\theta)=\sum_{\tau}R(\tau)\,\nabla_\theta P(\tau\mid\pi_\theta)
+\]
+直接计算有两个困难：$P(\tau\mid\pi_\theta)$ 是很多项的连乘，并且含有未知的环境转移概率；对所有轨迹求和也无法实现。
+
+利用对数求导技巧
+\[
+\nabla_\theta\log f(\theta)=\frac{\nabla_\theta f(\theta)}{f(\theta)}
+\quad\Longrightarrow\quad
+\nabla_\theta f(\theta)=f(\theta)\,\nabla_\theta\log f(\theta)
+\]
+可得
+\begin{align*}
+\nabla_\theta J(\pi_\theta)
+&=\sum_{\tau}R(\tau)\,P(\tau\mid\pi_\theta)\,\nabla_\theta\log P(\tau\mid\pi_\theta)\\
+&=\mathbb{E}_{\tau\sim\pi_\theta}\big[R(\tau)\,\nabla_\theta\log P(\tau\mid\pi_\theta)\big]
+\end{align*}
+第二步由期望的定义得到。这样，对所有轨迹求和变成了期望，可以用采样来估计。
+
+再对轨迹概率取对数，连乘变为连加：
+\begin{align*}
+\log P(\tau\mid\pi_\theta)
+&=\log\rho_0(s_0)+\sum_{t=0}^{T-1}\log P(s_{t+1}\mid s_t,a_t)\\
+&\quad+\sum_{t=0}^{T-1}\log\pi_\theta(a_t\mid s_t)
+\end{align*}
+前两项与 $\theta$ 无关，梯度为 $0$，所以
+\[
+\nabla_\theta\log P(\tau\mid\pi_\theta)=\sum_{t=0}^{T-1}\nabla_\theta\log\pi_\theta(a_t\mid s_t)
+\]
+代入上式，得到策略梯度：
+\[
+\nabla_\theta J(\pi_\theta)=\mathbb{E}_{\tau\sim\pi_\theta}\left[R(\tau)\sum_{t=0}^{T-1}\nabla_\theta\log\pi_\theta(a_t\mid s_t)\right]
+\]
+环境转移概率在求导时被消去，因此不需要知道环境模型，也能计算策略梯度。
+
+\subsubsection{小结}
+
+基于优化目标 $J(\pi_\theta)$，策略梯度为
+\[
+\nabla_\theta J(\pi_\theta)=\mathbb{E}_{\tau\sim\pi_\theta}\left[\sum_{t=0}^{T-1}R(\tau)\,\nabla_\theta\log\pi_\theta(a_t\mid s_t)\right]
+\]
+实际中采样 $N$ 条轨迹，用样本均值估计这个期望（无偏，但方差很大）：
+\[
+\nabla_\theta J(\pi_\theta)\approx\frac{1}{N}\sum_{n=0}^{N-1}\sum_{t=0}^{T_n-1}R(\tau_n)\,\nabla_\theta\log\pi_\theta\big(a_t^{n}\mid s_t^{n}\big)
+\]
+其中 $s_t^{n},a_t^{n}$ 是第 $n$ 条轨迹 $\tau_n$ 在时刻 $t$ 的状态和动作，$T_n$ 是它的长度。然后沿梯度上升更新参数（$\alpha$ 为学习率）：
+\[
+\theta\leftarrow\theta+\alpha\,\nabla_\theta J(\pi_\theta)
+\]
+
+\subsection{价值函数}
+
+上式用整条轨迹的回报 $R(\tau)$ 给每个动作打分，方差较大。更一般地，用 $\Psi_t$ 表示衡量动作 $a_t$ 好坏的权重，它可以是回报，也可以是价值函数。梯度可以写成
+\begin{align*}
+\nabla_\theta J(\pi_\theta)
+&=\mathbb{E}_{\tau\sim\pi_\theta}\left[\sum_{t=0}^{T-1}\Psi_t\,\nabla_\theta\log\pi_\theta(a_t\mid s_t)\right]\\
+&\approx\frac{1}{N}\sum_{n=0}^{N-1}\sum_{t=0}^{T_n-1}\Psi_t^{n}\,\nabla_\theta\log\pi_\theta\big(a_t^{n}\mid s_t^{n}\big)
+\end{align*}
+$\Psi_t$ 常见的形式如下（$Q_\pi$、$A_\pi$、$V_\pi$ 的定义见下文）：
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{cll}
+\hline
+ & $\Psi_t$ & 含义\\
+\hline
+1 & $\sum_{t'=0}^{T-1}\gamma^{t'}r_{t'}$ & 整条轨迹的回报 $R(\tau)$\\
+2 & $\sum_{t'=t}^{T-1}\gamma^{t'-t}r_{t'}$ & 动作 $a_t$ 之后的回报（reward-to-go）\\
+3 & $\sum_{t'=t}^{T-1}\gamma^{t'-t}r_{t'}-b(s_t)$ & 上一项减去基线 $b(s_t)$\\
+4 & $Q_\pi(s_t,a_t)$ & 动作价值函数\\
+5 & $A_\pi(s_t,a_t)$ & 优势函数\\
+6 & $r_t+\gamma V_\pi(s_{t+1})-V_\pi(s_t)$ & TD 误差（TD residual）\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{状态价值函数}
+
+记从时刻 $t$ 开始的回报为
+\[
+G_t=\sum_{k=0}^{T-t-1}\gamma^k r_{t+k}=r_t+\gamma G_{t+1}
+\]
+状态价值函数是从状态 $s_t$ 出发、按策略 $\pi$ 行动的期望回报：
+\[
+V_\pi(s_t)=\mathbb{E}_\pi\left[G_t\mid s_t\right]
+\]
+展开得
+\begin{align*}
+V_\pi(s_t)
+&=\mathbb{E}_\pi\left[r_t+\gamma G_{t+1}\mid s_t\right]\\
+&=\mathbb{E}_\pi\left[r_t\mid s_t\right]+\gamma\,\mathbb{E}_\pi\left[V_\pi(s_{t+1})\mid s_t\right]\\
+&=\sum_{a_t\in\mathcal{A}}\pi(a_t\mid s_t)\sum_{s_{t+1}\in\mathcal{S}}P(s_{t+1}\mid s_t,a_t)\,r(s_t,a_t,s_{t+1})\\
+&\quad+\gamma\sum_{a_t\in\mathcal{A}}\pi(a_t\mid s_t)\sum_{s_{t+1}\in\mathcal{S}}P(s_{t+1}\mid s_t,a_t)\,V_\pi(s_{t+1})\\
+&=\sum_{a_t\in\mathcal{A}}\pi(a_t\mid s_t)\sum_{s_{t+1}\in\mathcal{S}}P(s_{t+1}\mid s_t,a_t)\big[r_t+\gamma V_\pi(s_{t+1})\big]\\
+&=\mathbb{E}_{a_t\sim\pi(\cdot\mid s_t)}\Big[\mathbb{E}_{s_{t+1}\sim P(\cdot\mid s_t,a_t)}\big[r_t+\gamma V_\pi(s_{t+1})\big]\Big]
+\end{align*}
+第二步利用全期望公式和马尔可夫性，把 $\mathbb{E}_\pi\left[G_{t+1}\mid s_t\right]$ 写成了 $\mathbb{E}_\pi\left[V_\pi(s_{t+1})\mid s_t\right]$。
+
+\subsubsection{动作价值函数}
+
+动作价值函数是在状态 $s_t$ 执行动作 $a_t$、之后按策略 $\pi$ 行动的期望回报：
+\[
+Q_\pi(s_t,a_t)=\mathbb{E}_\pi\left[G_t\mid s_t,a_t\right]
+\]
+展开得
+\begin{align*}
+Q_\pi(s_t,a_t)
+&=\mathbb{E}_\pi\left[r_t+\gamma G_{t+1}\mid s_t,a_t\right]\\
+&=\mathbb{E}_\pi\left[r_t\mid s_t,a_t\right]+\gamma\,\mathbb{E}_\pi\left[V_\pi(s_{t+1})\mid s_t,a_t\right]\\
+&=\sum_{s_{t+1}\in\mathcal{S}}P(s_{t+1}\mid s_t,a_t)\big[r(s_t,a_t,s_{t+1})+\gamma V_\pi(s_{t+1})\big]\\
+&=\mathbb{E}_{s_{t+1}\sim P(\cdot\mid s_t,a_t)}\big[r_t+\gamma V_\pi(s_{t+1})\big]
+\end{align*}
+与 $V_\pi$ 相比，动作 $a_t$ 已经给定，所以只需对下一状态 $s_{t+1}$ 求期望。
+
+\subsubsection{状态价值与动作价值的关系、优势函数}
+
+比较两个展开式可知，$V_\pi$ 就是 $Q_\pi$ 对动作的期望：
+\[
+V_\pi(s_t)=\mathbb{E}_{a_t\sim\pi(\cdot\mid s_t)}\big[Q_\pi(s_t,a_t)\big]=\sum_{a_t\in\mathcal{A}}\pi(a_t\mid s_t)\,Q_\pi(s_t,a_t)
+\]
+优势函数衡量动作 $a_t$ 比当前策略的平均水平好多少：
+\[
+A_\pi(s_t,a_t)=Q_\pi(s_t,a_t)-V_\pi(s_t)
+\]
+由于 $V_\pi(s_t)$ 与 $s_{t+1}$ 无关，可以放进期望中：
+\begin{align*}
+A_\pi(s_t,a_t)
+&=\mathbb{E}_{s_{t+1}\sim P(\cdot\mid s_t,a_t)}\big[r_t+\gamma V_\pi(s_{t+1})\big]-V_\pi(s_t)\\
+&=\mathbb{E}_{s_{t+1}\sim P(\cdot\mid s_t,a_t)}\big[r_t+\gamma V_\pi(s_{t+1})-V_\pi(s_t)\big]\\
+&=\mathbb{E}_{s_{t+1}\sim P(\cdot\mid s_t,a_t)}\big[\delta_t\big]
+\end{align*}
+其中 $\delta_t=r_t+\gamma V_\pi(s_{t+1})-V_\pi(s_t)$ 称为 TD 误差（TD error）。当价值函数准确时，$\delta_t$ 是优势 $A_\pi(s_t,a_t)$ 的无偏估计。
+
+\subsection{Actor-Critic}
+
+Actor 是策略网络 $\pi_\theta$，负责选择动作；Critic 是价值网络 $V_\phi$，负责评估状态价值，并为 Actor 提供优势的估计。
+
+\subsubsection{Actor 的更新}
+
+用 Critic 给出的 TD 误差作为优势的估计：
+\[
+\hat{A}_t=r_t+\gamma V_\phi(s_{t+1})-V_\phi(s_t)
+\]
+代入策略梯度（即取 $\Psi_t=\hat{A}_t$）：
+\begin{align*}
+\nabla_\theta J(\pi_\theta)
+&\approx\mathbb{E}_{\tau\sim\pi_\theta}\left[\sum_{t=0}^{T-1}\hat{A}_t\,\nabla_\theta\log\pi_\theta(a_t\mid s_t)\right]\\
+&\approx\frac{1}{N}\sum_{n=0}^{N-1}\sum_{t=0}^{T_n-1}\hat{A}_t^{n}\,\nabla_\theta\log\pi_\theta\big(a_t^{n}\mid s_t^{n}\big)
+\end{align*}
+实现时通常写成按单步平均的目标函数，并把 $\hat{A}_t$ 当作常数（不对它求导）：
+\[
+L^{\text{actor}}(\theta)=\mathbb{E}_t\big[\hat{A}_t\log\pi_\theta(a_t\mid s_t)\big]
+\]
+它对 $\theta$ 的梯度就是上面的策略梯度估计，对它做梯度上升（或对 $-L^{\text{actor}}$ 做梯度下降）即可。注意它只是用来求梯度的替代目标，数值上并不等于 $J(\pi_\theta)$。
+
+\subsubsection{Critic 的更新}
+
+Critic 的目标是让预测值 $V_\phi(s_t)$ 逼近目标值（TD target）。
+
+\paragraph{优化目标}
+使用均方误差（MSE）作为损失，求使它最小的 $\phi$：
+\[
+L(\phi)=\mathbb{E}_t\Big[\big(\underbrace{r_t+\gamma V_\phi(s_{t+1})}_{\text{TD target}}-\underbrace{V_\phi(s_t)}_{\text{预测值}}\big)^2\Big]
+\]
+括号内就是 TD 误差 $\delta_t=r_t+\gamma V_\phi(s_{t+1})-V_\phi(s_t)$。注意 TD target 本身也是估计值，并不是真实价值。
+
+\paragraph{梯度}
+如果对 TD target 也求导，得到完整梯度：
+\[
+\nabla_\phi L=\mathbb{E}_t\Big[2\delta_t\big(\gamma\nabla_\phi V_\phi(s_{t+1})-\nabla_\phi V_\phi(s_t)\big)\Big]
+\]
+实际中把 TD target 当作常数（detach），只对预测值求导，称为半梯度（semi-gradient）：
+\[
+\nabla_\phi L\approx\mathbb{E}_t\big[-2\delta_t\,\nabla_\phi V_\phi(s_t)\big]
+\]
+这是 TD 学习的标准做法：目标值不随本次更新移动，训练更稳定。
+
+\paragraph{直观理解}
+梯度下降的更新为（$\beta$ 为学习率）
+\[
+\phi\leftarrow\phi-\beta\,\nabla_\phi L=\phi+2\beta\,\delta_t\,\nabla_\phi V_\phi(s_t)
+\]
+\begin{itemize}
+  \item $\delta_t>0$（预测偏低）：$V_\phi(s_t)$ 被\textbf{调高}；
+  \item $\delta_t<0$（预测偏高）：$V_\phi(s_t)$ 被\textbf{调低}。
+\end{itemize}
+
+\paragraph{PyTorch 伪代码}\mbox{}
+\begin{verbatim}
+values = critic_net(states)
+with torch.no_grad():  # TD target 不参与求导
+    next_values = critic_net(next_states)
+    # dones=1 表示终止状态，没有后续价值
+    td_target = rewards + gamma * next_values * (1 - dones)
+
+critic_loss = nn.MSELoss()(values, td_target)
+critic_optimizer.zero_grad()  # 清空上一步的梯度
+critic_loss.backward()
+critic_optimizer.step()
+\end{verbatim}
+
+\subsubsection{Actor-Critic 的迭代过程}
+
+\paragraph{策略改进（Actor）}
+设 Critic 能准确评估当前策略 $\pi$（即 $V_\phi=V_\pi$），按优势更新策略参数：
+\[
+\theta\leftarrow\theta+\alpha\,A_\pi(s_t,a_t)\,\nabla_\theta\log\pi_\theta(a_t\mid s_t)
+\]
+$A_\pi(s_t,a_t)>0$ 时提高 $\pi_\theta(a_t\mid s_t)$，$A_\pi(s_t,a_t)<0$ 时降低，由此得到新策略 $\pi'$。
+
+\paragraph{何时达到最优}
+记 $s_t$ 下最好的动作为 $a_t^*=\arg\max_a Q_\pi(s_t,a)$。利用 $\sum_a\pi(a\mid s_t)=1$：
+\begin{align*}
+A_\pi(s_t,a_t^*)
+&=Q_\pi(s_t,a_t^*)-\sum_{a\in\mathcal{A}}\pi(a\mid s_t)\,Q_\pi(s_t,a)\\
+&=\sum_{a\in\mathcal{A}}\pi(a\mid s_t)\big[Q_\pi(s_t,a_t^*)-Q_\pi(s_t,a)\big]\\
+&=\sum_{a\neq a_t^*}\underbrace{\pi(a\mid s_t)}_{\text{选其他动作的概率}}\,
+\underbrace{\big[Q_\pi(s_t,a_t^*)-Q_\pi(s_t,a)\big]}_{\text{动作间的差距}\,\geq\,0}
+\end{align*}
+当 $\pi(a_t^*\mid s_t)\to 1$ 时，其他动作的概率趋于 $0$，于是
+\[
+V_\pi(s_t)\to Q_\pi(s_t,a_t^*),\qquad A_\pi(s_t,a_t^*)\to 0
+\]
+若每个状态都如此，策略已无改进空间，即达到最优策略 $\pi^*$。
+
+注意：优势趋于 $0$ 并不表示动作分不出好坏。方括号中的差距始终存在，趋于 $0$ 的是选其他动作的概率；较差动作的优势 $A_\pi(s_t,a)\to Q_\pi(s_t,a)-Q_\pi(s_t,a_t^*)<0$，只是它们几乎不再被采样。
+
+\paragraph{价值评估（Critic）}
+策略由 $\pi$ 更新为 $\pi'$ 后，关系式 $V(s_t)=\sum_a\pi(a\mid s_t)\,Q(s_t,a)$ 右侧的动作分布随之改变，旧的 $V_\pi$ 不再适用，需要重新拟合：
+\[
+V_{\pi'}(s_t)=\sum_{a\in\mathcal{A}}\pi'(a\mid s_t)\,Q_{\pi'}(s_t,a)
+\]
+实际中通过最小化前面的 Critic 损失 $L(\phi)$ 完成这一步。当 $V_\phi=V_\pi$ 时，$\mathbb{E}\left[\delta_t\mid s_t,a_t\right]=A_\pi(s_t,a_t)$，所以 critic loss 趋于 $0$ 与优势趋于 $0$ 相对应。
+
+\paragraph{小结}
+Critic 评估当前策略，Actor 依据优势改进策略，二者交替进行。当优势与 critic loss 都趋于 $0$ 时：
+\begin{itemize}
+  \item Actor：每个状态下 $\pi_\theta(a_t^*\mid s_t)\to 1$，即 $\pi_\theta\to\pi^*$；
+  \item Critic：准确评估当前策略，$V_\phi\to V_\pi$；随着策略逼近最优，$V_\phi\to V_{\pi^*}$。
+\end{itemize}
+
+\subsection{重要性采样与GAE}
+对于Actor的梯度优化目标而言，
+\begin{align*}
+\nabla_\theta J(\pi_\theta)
+&\approx\mathbb{E}{\tau\sim\pi\theta}\left[\sum_{t=0}^{T-1}\hat{A}t\,\nabla\theta\log\pi_\theta(a_t\mid s_t)\right]\\
+&\approx\frac{1}{N}\sum_{n=0}^{N-1}\sum_{t=0}^{T_n-1}\hat{A}t^{n}\,\nabla\theta\log\pi_\theta\big(a_t^{n}\mid s_t^{n}\big)
+\end{align*}
+在实际运行中，我们每次针对策略\(\pi_\theta\)采样后，得到相应的数据\(r_t,V_\phi(s_{t+1},\nabla log\pi_\theta(a_t|s_t)\)等，再根据这些数据，带入公式并更新参数，参数更新后，在旧策略\(\pi_{\theta_{old}}\)下采样的数据就不能使用了，需要重新采样数据，再由重新采样的数据更新参数（on-policy），而每一次重新采样会带来较大的资源消耗，由于每次采样的随机性很大，此时，采样带来的方差往往很大；更重要的是，在实际训练过程中，用critic网络拟合出来\(V_\pi\)并不一定是准确的价值函数，所以，我们使用的TD error去估计优势其实是有偏差的。
+
+为此，我们希望同一条旧数据能用很多次，研究者引入：
+
+重要性采样（important Sampling）：让旧数据也能被反复利用几次
+GAE：平衡优势函数的方差和偏差
+经验回放：把以前的数据存起来，像抽盲盒一样混合着抽出来用（off-policy）
+
+重要性采样：
+为了降低采样成本，我们希望采样一批的数据能用来更新神经网络多次，
+假设某次更新完毕后，我们得到策略\(\pi_{old}\)
+我们用\(\pi_{old}\)和环境交互，得到一批回合数据
+我们把这批回合数据重复使用k次：我们先把这批数据喂给\(\pi_{old}\)得到\(\pi_{\theta_1}\)，再把这批数据喂给\(\pi_{\theta_1}\)得到\(\pi_{\theta_2}\),以此类推，当重复k次后，我们得到了\(\pi_\theta\)
+
+\begin{itemize}
+\item 假设有两个分布 \(p(x), q(x)\)
+\item 最开始我想从 \(p(x)\) 中进行多次采样，然后求函数 \(f(x)\) 的期望。例如我想从 \(\pi_\theta\) 中进行采样，然后求累积奖励的期望，这个期望我们表示成 \(E_{x \sim p(x)}[f(x)]\)
+\item 但是现在，因为某些原因，我们无法从 \(p(x)\) 中直接采样，只能从另一个分布 \(q(x)\) 中进行采样了，那么此时我们要怎么表示 \(E_{x \sim p(x)}[f(x)]\)？
+\item 为了解决这个问题，我们做如下变换：
+\end{itemize}
+
+
+
+\begin{align*}
+E_{x \sim p(x)} [f(x)] &= \int p(x) f(x) dx \\
+&= \int \frac{p(x)}{q(x)} q(x) f(x) dx \\
+&= E_{x \sim q(x)} \left[ \frac{p(x)}{q(x)} f(x) \right]
+\end{align*}
+
+
+但在实际操作中，我们会遇到p(x)和q(x)分布差异较大的问题，这个时候，我们需要足够多的采样来抵消这种差异对期望的最终影响。
+
+\textbf{重要性采样前，策略的梯度是：}
+
+\[
+\nabla J(\pi_\theta) = E_t [A_\phi(s_t, a_t) \nabla \log \pi_\theta(a_t|s_t)]
+\]
+
+\textbf{重要性采样后，策略的梯度是：}
+
+\[
+\nabla J(\pi_\theta) = \underset{\tau \sim \pi_{\theta_{old}}}{E_t} \left[ \frac{\pi_\theta(a_t|s_t)}{\pi_{old}(a_t|s_t)} A_\phi(s_t, a_t) \nabla \log \pi_\theta(a_t|s_t) \right]
+\]
+
+\textbf{我们根据重要性采样构造了这个新的策略梯度，那么对应的新的 actor 优化目标就可以从这个策略梯度中反推出来：}
+
+\[
+\arg \max_{\pi_\theta} J(\pi_\theta) = \underset{\tau \sim \pi_{\theta_{old}}}{E_t} \left[ \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)} A_\phi(s_t, a_t) \right]
+\]
+
+GAE：平衡优势函数的方差和偏差
+在前面我们假设了\(V_\pi\)能正确评估策略\(\pi\)的情况下，我们利用\(r_t + \gamma V_\pi(s_{t+1}) - V_\pi(s_t)\)作为优势函数\(A_\pi\)的无偏估计，但在训练过程中，\(V_\pi\) 往往无法完全准确评估策略\(\pi\)的价值。
+
+\textbf{为了解决因为 \(V_\pi\) 估计不准而引发的“高偏差”问题，直观上我们可以尽量少信任 \(V_\pi\) 的策略，即对于 \(r_t + \gamma V_\pi(s_{t+1}) - V_\pi(s_t)\)，我们可以把 \(V_\pi(s_{t+1})\) 做递归地展开，得到：}
+
+\[
+-V_\pi(s_t) + \sum_{l=0}^{\infty} \gamma^l r_{t+l}
+\]
+
+其中，\(r_t, r_{t+1}, r_{t+2}, \dots\) 都是我们某次采样得到的即时奖励数据。如果 \(V_\pi\) 不准，那么我就信任我的实际采样结果，这样至少不会让我对优势函数的估计出现偏差。
+
+但采取这种做法又会引发一个新问题：我们知道 \(r_t, r_{t+1}, r_{t+2}, \dots\) 它们都是随机变量，相比之前只用 \(r_t\)，现在的做法带来的随机性更大了（相当于在每一个 timestep 都引入了随机性，随机性逐步累加）。也就是如果之前的方差是 \(Var(r_t)\)，那么现在的方差则变成更大。
+
+当 \(V_\pi\) 估计不准时，如果我能在这 \(r_t + \gamma V_\pi(s_{t+1}) - V_\pi(s_t)\) 和 \(-V_\pi(s_t) + \sum_{l=0}^{\infty} \gamma^l r_{t+l}\) 间取得一种平衡，即我既不想完全信任 \(V_\pi\)，又不想完全信任我全部的采样的结果 \(r_t, r_{t+1}, r_{t+2}, \dots\)，\textbf{此时，GAE 通过一个超参数 \(\lambda\) 控制了我们想要的方差-偏差间的平衡。}
+
+\[
+\Psi_t = \sum_{l=0}^{\infty} (\gamma\lambda)^l \delta_{t+l}
+\]
+
+\begin{itemize}
+\item \(\delta_t = r_t + \gamma V_\pi(s_{t+1}) - V_\pi(s_t)\)
+\item \(\gamma\)：超参，折扣因子
+\item \(\lambda\)：\textbf{超参，即用于平衡方差-偏差的因子。}
+\begin{itemize}
+\item 当\(\lambda\)接近0时，\(\Psi_t\)退化成 \(r_t + \gamma V_\pi(s_{t+1}) - V_\pi(s_t)\)，也即上图所绘制的高偏差情况
+\item 当\(\lambda\)接近1时，\(\Psi_t\)变成 \(-V_\pi(s_t) + \sum_{l=0}^{\infty} \gamma^l r_{t+l}\)，也即上图所绘制的高方差-低偏差情况
+\item \textbf{综上，\(\lambda\)越小，方差越小，偏差越大。\(\lambda\)越大，方差越大，偏差越小。}
+\end{itemize}
+\end{itemize}
+
+\textbf{在接下来的表达中，我们记这种引入了GAE方法的单步优势为} \(A_\phi^{GAE}(s_t, a_t)\)
+
+在引入重要性采样和GAE后，我们的优化目标变成\[
+arg \max_{\pi_\theta} J(\pi_\theta) = \underset{\tau \sim \pi_{\theta_{old}}}{E_t} \left[ \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)} A_\phi^{GAE}(s_t, a_t) \right]
+\]
+
+\subsection{TRPO}
+在Actor-critic框架中，对于citic，我们的优化目标为\[\min_\phi L(\phi) = E_t \left[ \left( V_\phi(s_t) - V_{target} \right)^2 \right]\]
+
+对于Actor，我们的优化目标为，\[
+arg \max_{\pi_\theta} J(\pi_\theta) = \underset{\tau \sim \pi_{\theta_{old}}}{E_t} \left[ \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)} A_\phi^{GAE}(s_t, a_t) \right]
+\]
+
+但如果\(\pi_\theta\)和\(\pi_{old}\)这两个分布差异太大，且我们采样的轨迹数量没有足够大时，\(J(\pi_\theta\)的估计是不准确的。
+
+TRPO的解决办法是，把 \(\pi_\theta\) 和 \(\pi_{old}\) 的分布相似性作为 \(J(\pi_\theta)\) 的 constraint，\textbf{这就是 TRPO 的做法，即我们有：}
+
+\begin{align*}
+arg \max_{\pi_\theta} J(\pi_\theta) &= \underset{\tau \sim \pi_{\theta_{old}}}{E_t} \left[ \frac{\pi_\theta(a_t|s_t)}{\pi_{old}(a_t|s_t)} A_\phi^{GAE}(s_t, a_t) \right] \\[1.5ex]
+subject\ to\ E_t &[KL(\pi_{\theta_{old}}(\cdot|s_t), \pi_\theta(\cdot|s_t))] \leq \delta
+\end{align*}
+
+由于这种限制不直接加在 \(J(\pi_\theta)\) 中，因此使得整体优化过程变得较为复杂，
+
+\subsection{PPO}
+我们重新来端详引入重要性采样和GAE以后的强化学习优化目标：
+
+\[
+arg \max_{\pi_\theta} J(\pi_\theta) = \underset{\tau \sim \pi_{\theta_{old}}}{E_t} \left[ \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)} A_\phi^{GAE}(s_t, a_t) \right]
+\]
+
+\begin{itemize}
+\item \textbf{当 \(A_\phi^{GAE}(s_t, a_t) > 0\) 时，说明我们当前执行的动作 \(a_t\) 相较于别的动作更好，因此我们要提升 \(\pi_\theta(a_t|s_t)\)。}但是考虑到在采样不足的情况下，\(\pi_\theta\) 和 \(\pi_{\theta_{old}}\) 的分布差异不能太大，因此 \(\frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}\) 是有上限的，即不能一味轻信 \(A_\phi^{GAE}(s_t, a_t)\) 而持续不断提升 \(\pi_\theta(a_t|s_t)\)，你要保证 \(\pi_\theta\) 在 \(\pi_{\theta_{old}}\) 的信任阈内。\textbf{我们假设当这个比值 \(>= 1 + \epsilon\) 的时候，就对这个比值做 clip，固定在 \(1 + \epsilon\)。}
+\item \textbf{当 \(A_\phi^{GAE}(s_t, a_t) < 0\) 时，说明我们当前执行的动作 \(a_t\) 相较于别的动作更差，因此我们要降低 \(\pi_\theta(a_t|s_t)\)。}考虑到 \(\pi_\theta\) 和 \(\pi_{old}\) 的分布差异不能太大，因此 \(\frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}\) 是有下限的，即不能一味轻信 \(A_\phi^{GAE}(s_t, a_t)\) 而持续不断降低 \(\pi_\theta(a_t|s_t)\)，\textbf{我们假设当这个比值 \(<= 1 - \epsilon\) 的时候，就对这个比值做 clip，固定在 \(1 - \epsilon\)。}
+\item \textbf{\(\epsilon\) 就是 PPO 当中的一个超参。}
+\end{itemize}
+
+基于这种 clip 思想，我们得出了 ppo-clip 下强化学习的优化目标，为了表达简便，我们这里令 \(r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}\)：
+
+\[
+J^{CLIP}(\pi_\theta) = \underset{\tau \sim \pi_{\theta_{old}}}{E_t} \left[ min \left[ r_t(\theta)A_\phi^{GAE}(s_t, a_t), \ clip(r_t(\theta), 1-\epsilon, 1+\epsilon)A_\phi^{GAE}(s_t, a_t) \right] \right]
+\]
+
+
+在PPO中，critic网络的loss设计为：
+\begin{align*}
+V_t^{CLIP} &= clip(V_t^{new}, V_t^{old} - \epsilon, V_t^{old} + \epsilon) \\
+R_t &= A_t^{GAE} + V_t^{old}
+\end{align*}
+
+\[
+arg \min_{V_\phi} L(V_\phi) = E_t \left[ max \left[ (V_t^{new} - R_t)^2, (V_t^{CLIP} - R_t)^2 \right] \right]
+\]
+
+我们来详细解释这个公式的含义：
+
+\begin{itemize}
+\item 首先，我们先根据 8.3 (2) 中对 GAE 的定义，递归地展开 \(A_t^{GAE}\)，得到：
+\[
+A_t^{GAE} = \delta_t + \gamma\lambda A_{t+1}^{GAE} = (r_t + \gamma * V_{t+1}^{old} - V_t^{old}) + \gamma\lambda A_{t+1}^{GAE}
+\]
+
+\item 基于这个表达式，本质上 \(R_t = A_t^{GAE} + V_t^{old} = (r_t + \gamma * V_{t+1}^{old}) + \gamma\lambda A_{t+1}^{GAE}\)
+
+\item 在 ppo epoch 开始前，我们有初始 actor 和初始 critic。其中初始 critic 就是上面所说的 \(V_t^{old}\)
+
+\item 我们用初始 actor 和初始 critic 产生经验值，然后这波经验值将被用在接下来 ppo epochs 轮的迭代中，也就是在这些迭代中，\textbf{上式里的 \(r_t, V_t^{old}, V_{t+1}^{old}, A_t^{GAE}, A_{t+1}^{GAE}, R_t\) 都来自这些初始的经验值，它们在接下来的这个 ppo epochs 轮迭代中是不变的。}
+
+\item \textbf{本质上，critic 的优化目标是以下差值的平方：} \\
+\(V_t^{new} - R_t = [V_t^{new} - (r_t + \gamma * V_{t+1}^{old})] - \gamma\lambda A_{t+1}^{GAE}\)。这里我们先不考虑 clip，因为 clip 只是一种 trick。
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{在理解了这些基本点的基础上，我们再来考虑引入 clip 的作用，它和 actor 的 ppo-clip 一样，}本质上是想让 critic 在信任阈内更新：
+\begin{itemize}
+\item 当 \(V_t^{new} < R_t\) 时，我们确实应该鼓励 \(V_t^{new}\) 向 \(R_t\) 提升，但是如果它本身的值已经超出 \(V_t^{old}\) 的信任阈 \(V_t^{old} + \epsilon\) 之外，此时我们就应该对它做 clip。也就是说，如果此时我们应用 max，最终取的是 \((V_t^{CLIP} - R_t)^2\)，注意，\(V_t^{CLIP}\) 最终是由 \(V_t^{old}\) 定义的，而这一项来自我们之前收集的经验，是个独立的常数，它和等待更新的这个 critic 无关，所以相当于我们本次不对 critic 做梯度更新。
+\item 当 \(V_t^{new} > R_t\) 时，也是同理类推，这里不赘述。
+\end{itemize}
+\end{itemize}
+
+\section{参考}
+1、https://www.zhihu.com/people/lemonround/posts
+
+2、https://www.xiaohongshu.com/explore/6addc9fe00000000250057e0?app_platform=android\&ignoreEngage=true\&app_version=9.49.1\&share_from_user_hidden=true\&xsec_source=app_share\&type=normal\&xsec_token=CBTDga-aRbhPGpX2PUUzTnA-kAeTzBeo5DCf0fU57KXsU=\&author_share=1\&xhsshare=WeixinSession\&shareRedId=N0o1Mjw1SkI2NzUyOTgwNjc1OTg1Okg-\&apptime=1792925623\&share_id=d7541f253f7a4b3592c4d44159bf7dd0\&share_channel=wechat\&track_c
+
+\end{document}

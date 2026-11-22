@@ -1,19 +1,20 @@
 baseURL = "https://tanyrbs.github.io/"
-locale = "en-US"
-title = "Haotao TAN"
-copyright = "(c) 2026 Haotao TAN"
+enableGitInfo = true
+title = "谭浩陶"
+copyright = "(c) 2026 谭浩陶"
 enableRobotsTXT = true
 timeZone = "Asia/Shanghai"
 summaryLength = 28
-defaultContentLanguage = "en"
-defaultContentLanguageInSubdir = false
+defaultContentLanguage = "zh-cn"
+locale = "zh-CN"
 
 [params]
-  description = "Haotao TAN, East China University of Science and Technology"
-  author = "Haotao TAN"
-  affiliation = "East China University of Science and Technology"
+  description = "谭浩陶，华东理工大学"
+  author = "谭浩陶"
+  affiliation = "华东理工大学"
   email = "19003279@mail.ecust.edu.cn"
   github = "https://github.com/tanyrbs"
+  repoURL = "https://github.com/tanyrbs/tanyrbs.github.io"
   avatar = "/img/avatar_hu11966206482947421333.JPG"
   images = ["/img/avatar_hu11966206482947421333.JPG"]
   mainSections = ["blog"]
@@ -32,46 +33,15 @@ defaultContentLanguageInSubdir = false
     emitMetadata = "0"
     inputPosition = "bottom"
     theme = "light"
-    lang = "en"
-
-[languages]
-  [languages.en]
-    contentDir = "content/en"
-    label = "English"
-    weight = 1
-    title = "Haotao TAN"
-    locale = "en-US"
-    [languages.en.params]
-      description = "Haotao TAN, East China University of Science and Technology"
-      author = "Haotao TAN"
-      affiliation = "East China University of Science and Technology"
-      email = "19003279@mail.ecust.edu.cn"
-      github = "https://github.com/tanyrbs"
-      avatar = "/img/avatar_hu11966206482947421333.JPG"
-      dateFormat = "2006-01-02"
-      giscusLang = "en"
-
-  [languages.zh-cn]
-    contentDir = "content/zh-cn"
-    label = "中文"
-    weight = 2
-    title = "谭浩陶"
-    locale = "zh-CN"
-    [languages.zh-cn.params]
-      description = "谭浩陶，华东理工大学"
-      author = "谭浩陶"
-      affiliation = "华东理工大学"
-      email = "19003279@mail.ecust.edu.cn"
-      github = "https://github.com/tanyrbs"
-      avatar = "/img/avatar_hu11966206482947421333.JPG"
-      dateFormat = "2006-01-02"
-      giscusLang = "zh-CN"
+    lang = "zh-CN"
 
 [permalinks]
   [permalinks.page]
-    blog = "/blog/:year/:month/:slug/"
+    blog = "/blog/:slug/"
+    notes = "/notes/:slug/"
   [permalinks.section]
     blog = "/blog/"
+    notes = "/notes/"
 
 [outputs]
   home = ["HTML", "RSS"]
@@ -103,3 +73,6 @@ defaultContentLanguageInSubdir = false
     startLevel = 2
     endLevel = 3
     ordered = false
+
+[frontmatter]
+  lastmod = ["lastmod", ":git", ":fileModTime"]

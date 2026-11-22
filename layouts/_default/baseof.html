@@ -18,11 +18,6 @@
           {{ partial "nav.html" . }}
           {{ partial "profile.html" . }}
           <div class="sidebar-controls">
-            <span class="language-switcher" aria-label="{{ i18n "language" }}">
-              {{ range .AllTranslations }}
-                <a href="{{ .RelPermalink }}"{{ if eq .Language.Lang $.Language.Lang }} aria-current="page"{{ end }}>{{ .Language.Label }}</a>
-              {{ end }}
-            </span>
             <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">{{ i18n "darkMode" }}</button>
           </div>
         </div>

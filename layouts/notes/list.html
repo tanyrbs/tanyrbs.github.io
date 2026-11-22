@@ -1,0 +1,39 @@
+{{ define "main" }}
+  {{ $notes := where site.RegularPages "Section" "notes" }}
+  {{ $seriesOrder := slice }}
+  {{ $groups := dict }}
+  {{ range $notes }}
+    {{ $key := .Params.lectureSeries | default "" }}
+    {{ if not (in $seriesOrder $key) }}
+      {{ $seriesOrder = $seriesOrder | append $key }}
+    {{ end }}
+    {{ $existing := index $groups $key | default slice }}
+    {{ $groups = merge $groups (dict $key ($existing | append .)) }}
+  {{ end }}
+
+  <header class="page-header">
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p>{{ . }}</p>{{ end }}
+    <p class="catalog-stats">{{ i18n "noteCount" (dict "Count" (len $notes)) }}</p>
+  </header>
+
+  {{ if $notes }}
+    {{ range $seriesOrder }}
+      {{ $items := index $groups . }}
+      {{ $items = sort $items "Params.lectureNumber" }}
+      <section class="notes-series">
+        <h2>{{ if . }}{{ . }}{{ else }}{{ i18n "uncategorized" }}{{ end }}</h2>
+        <ol>
+          {{ range $items }}
+            <li>
+              <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+              {{ with .Params.description }}<span class="notes-series-desc"> — {{ . }}</span>{{ end }}
+            </li>
+          {{ end }}
+        </ol>
+      </section>
+    {{ end }}
+  {{ else }}
+    <p class="empty-state">{{ i18n "noPosts" }}</p>
+  {{ end }}
+{{ end }}

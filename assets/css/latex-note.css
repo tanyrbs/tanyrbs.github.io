@@ -1,0 +1,166 @@
+/* LaTeX 笔记：把 tex4ht 产出的 HTML 接进站点排版 */
+.latex-note {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--text);
+}
+.latex-note p {
+  margin: 0 0 1.05em;
+  text-align: left;
+}
+.latex-note h2,
+.latex-note h3,
+.latex-note h4 {
+  margin: 2em 0 0.7em;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--brand);
+}
+.latex-note h2 { font-size: 1.5rem; border-bottom: 1px solid var(--line); padding-bottom: 0.4em; }
+.latex-note h3 { font-size: 1.22rem; }
+.latex-note h4 { font-size: 1.06rem; }
+.latex-note .titlemark {
+  color: var(--accent);
+  margin-right: 0.45em;
+  font-variant-numeric: tabular-nums;
+}
+.latex-note ul,
+.latex-note ol {
+  margin: 0 0 1.05em 1.4em;
+  padding: 0;
+}
+.latex-note li { margin: 0.3em 0; }
+
+.latex-note .katex-math { display: inline; }
+.latex-note .katex-display {
+  display: block;
+  margin: 1.1em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-align: center;
+}
+.latex-note math {
+  font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math", serif;
+}
+
+/* tex4ht 的定理/证明结构（未来用到 amsthm 时可直接生效） */
+.latex-note .newtheorem {
+  margin: 1.5em 0;
+  padding: 0.9em 1.1em;
+  border-left: 3px solid var(--accent);
+  background: var(--surface-soft);
+}
+.latex-note .newtheorem .head {
+  color: var(--accent);
+  font-weight: 700;
+}
+.latex-note .proof {
+  margin: 1.2em 0;
+  padding-left: 1em;
+  border-left: 2px solid var(--line);
+}
+
+.latex-note table {
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  width: 100%;
+  font-size: 0.94rem;
+}
+.latex-note table td,
+.latex-note table th {
+  padding: 0.5em 0.7em;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.latex-note table tr:first-child td { border-top: 1.5px solid var(--muted); }
+.latex-note table tr:last-child td { border-bottom: 1.5px solid var(--muted); }
+
+.latex-note pre {
+  margin: 1.1em 0;
+  padding: 0.9em 1em;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+.latex-note .math-error {
+  color: #b3261e;
+  background: #fdecea;
+  padding: 0 0.3em;
+  border-radius: 4px;
+}
+
+/* 顶部工具条：标识这是一篇 LaTeX 笔记 */
+.latex-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em 1em;
+  margin: 0 0 1.4em;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.latex-badge {
+  padding: 0.1em 0.55em;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.latex-toolbar a { color: var(--muted); text-decoration: underline; }
+.latex-toolbar a:hover { color: var(--accent); }
+
+/* 系列导航 */
+.note-series {
+  margin: 0 0 1.6em;
+  padding: 0.9em 1.1em;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-soft);
+  font-size: 0.9rem;
+}
+.note-series-title { margin: 0 0 0.5em; font-weight: 700; }
+.note-series ol { margin: 0; padding-left: 1.2em; }
+.note-series li { margin: 0.25em 0; }
+.note-series li[aria-current] { font-weight: 700; color: var(--accent); }
+
+/* 目录 */
+.note-toc-list {
+  margin: 0;
+  padding-left: 1.1em;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.note-toc-list ul { padding-left: 1em; }
+
+/* 页脚：许可 / 勘误 / 更新 */
+.note-footer {
+  margin: 2.6em 0 0;
+  padding-top: 1.2em;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em 1.4em;
+  align-items: baseline;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.note-footer a { color: inherit; text-decoration: underline; }
+.note-footer a:hover { color: var(--accent); }
+
+/* 相关笔记 */
+.related-notes { margin: 2em 0 0; }
+.related-notes h2 { font-size: 1.05rem; margin: 0 0 0.6em; }
+.related-notes ul { margin: 0; padding-left: 1.2em; line-height: 1.8; }
+
+/* 笔记列表：按系列分组 */
+.notes-series { margin: 0 0 2.4em; }
+.notes-series h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.8em;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--line);
+}
+.notes-series ol { margin: 0; padding-left: 1.3em; line-height: 1.9; }

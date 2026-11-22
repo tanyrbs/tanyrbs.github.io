@@ -1,0 +1,33 @@
+{{- $pages := where site.RegularPages "Section" "in" (slice "blog" "notes") -}}
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}</title>
+    <link>{{ .Permalink }}</link>
+    <description>{{ with .Description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}</description>
+    <language>{{ site.Language.Lang }}</language>
+    <generator>Hugo</generator>
+    <atom:link href="{{ .Permalink }}" rel="self" type="application/rss+xml" />
+    {{- $base := strings.TrimSuffix "/" site.BaseURL }}
+    {{- range first 20 $pages.ByLastmod.Reverse }}
+      {{- $body := "" }}
+      {{- if .Params.latex }}
+        {{- $body = (os.ReadFile (path.Join "assets" "notes" (.Params.slug | default .File.ContentBaseName) "body.html")) | default "" }}
+      {{- else }}
+        {{- $body = .Content }}
+      {{- end }}
+      {{- $body = $body
+        | replaceRE `href="/` (printf `href="%s/` $base)
+        | replaceRE `src="/` (printf `src="%s/` $base) }}
+    <item>
+      <title>{{ .Title }}</title>
+      <link>{{ .Permalink }}</link>
+      <guid isPermaLink="true">{{ .Permalink }}</guid>
+      <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</pubDate>
+      {{- with .Params.description }}<category>{{ . }}</category>{{ end }}
+      {{- range .Params.tags }}<category>{{ . }}</category>{{ end }}
+      <description>{{ $body | transform.XMLEscape | safeHTML }}</description>
+    </item>
+    {{- end }}
+  </channel>
+</rss>

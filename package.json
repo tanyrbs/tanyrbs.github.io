@@ -1,0 +1,18 @@
+{
+  "name": "tanyrbs-blog",
+  "private": true,
+  "type": "module",
+  "description": "Hugo blog with LaTeX-compiled notes",
+  "scripts": {
+    "notes:compile": "node scripts/latex/compile.mjs",
+    "notes:post": "node scripts/latex/postprocess.mjs",
+    "notes": "npm run notes:compile && npm run notes:post",
+    "site": "node scripts/hugo.mjs --minify --gc",
+    "serve": "node scripts/hugo.mjs server -D",
+    "search": "npx -y pagefind@1.6.0 --site public",
+    "publish": "npm run notes && npm run site && npm run search"
+  },
+  "devDependencies": {
+    "katex": "^0.16.11"
+  }
+}

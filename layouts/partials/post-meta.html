@@ -2,13 +2,16 @@
   {{ with .Date }}
     <time datetime="{{ .Format "2006-01-02" }}">{{ .Format (site.Params.dateFormat | default "2006-01-02") }}</time>
   {{ end }}
-  {{ with .GetTerms "categories" }}
+  {{ $categories := .GetTerms "categories" }}
+  {{ $categoryNames := slice }}
+  {{ range $categories }}{{ $categoryNames = $categoryNames | append .LinkTitle }}{{ end }}
+  {{ with $categories }}
     {{ range . }}<a class="meta-pill category-pill" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}
   {{ end }}
   {{ with .GetTerms "tags" }}
-    {{ range . }}<a class="meta-pill" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}
+    {{ range . }}{{ if not (in $categoryNames .LinkTitle) }}<a class="meta-pill" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}{{ end }}
   {{ end }}
-  {{ if and site.Params.showReadingTime .ReadingTime }}
+  {{ if and site.Params.showReadingTime .ReadingTime (not .Params.latex) }}
     <span class="reading-time">{{ i18n "readingTime" .ReadingTime }}</span>
   {{ end }}
   {{ if and .Lastmod (gt .Lastmod .Date) }}

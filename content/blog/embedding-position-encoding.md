@@ -1,4 +1,5 @@
 ---
+aliases: ["/zh-cn/blog/2026/09/embedding-position-encoding/"]
 title: "Embedding 与位置编码"
 date: 2026-09-28T18:00:00+08:00
 draft: false
