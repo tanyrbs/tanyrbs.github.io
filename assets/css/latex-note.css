@@ -209,3 +209,38 @@
   font-size: 0.8em;
   vertical-align: 0.1em;
 }
+/* 与 Markdown 文章（.lecture-content）对齐：同一套衬线排版与标题样式，
+   这样 LaTeX 笔记和手写短文在页面上是同一个模板。 */
+.latex-note {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+.latex-note p {
+  margin: 0 0 1em;
+}
+.latex-note h2 {
+  margin: 36px 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #dce4f3;
+  color: #1f3c88;
+  font-size: 25px;
+  line-height: 1.5;
+}
+.latex-note h3 {
+  margin: 26px 0 12px;
+  color: #2f54eb;
+  font-size: 21px;
+  line-height: 1.5;
+}
+.latex-note h4 {
+  margin: 22px 0 10px;
+  color: #1f3c88;
+  font-size: 18px;
+  line-height: 1.45;
+}
+.latex-note ul,
+.latex-note ol {
+  margin: 0 0 1em 1.4em;
+}

@@ -3,7 +3,6 @@
   {{ $latex := .Params.latex }}
   {{ $isNote := eq .Section "notes" }}
   {{ $slug := .Params.slug | default .File.ContentBaseName }}
-  {{ $slug := .Params.slug | default .File.ContentBaseName }}
   <article class="article-surface{{ if $lecture }} lecture-article{{ end }}" data-pagefind-body>
     <header class="article-header{{ if $lecture }} lecture-banner{{ end }}">
       {{ if $lecture }}
@@ -23,12 +22,9 @@
       {{ end }}
     </header>
 
-    {{ if $latex }}{{ partial "latex-toolbar.html" . }}{{ end }}
-
     {{ if $latex }}
-      {{ if $isNote }}{{ partial "note-series.html" . }}{{ end }}
       {{ with os.ReadFile (path.Join "assets" "notes" $slug "toc.html") }}
-        <details class="toc lecture-toc" data-pagefind-ignore open>
+        <details class="toc lecture-toc" data-pagefind-ignore>
           <summary>{{ i18n "tableOfContents" }}</summary>
           {{ . | safeHTML }}
         </details>
@@ -59,14 +55,10 @@
       {{ end }}
     </div>
 
-    {{ if $latex }}{{ partial "note-footer.html" . }}{{ end }}
-
     {{ if eq .Section "blog" }}
       {{ partial "comments.html" . }}
     {{ end }}
   </article>
-
-  {{ if $isNote }}{{ partial "related-notes.html" . }}{{ end }}
 
   {{ if or (eq .Section "blog") $isNote }}
     <nav class="article-pagination" aria-label="{{ i18n "articleNavigation" }}">
