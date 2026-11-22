@@ -117,7 +117,8 @@ button:focus-visible {
 .brand-description {
   color: #d2d3d5;
   font-size: 13px;
-  line-height: 1.45;
+  line-height: 1.55;
+  text-wrap: balance;
 }
 
 .site-nav {
@@ -868,13 +869,10 @@ button:focus-visible {
     gap: 10px;
   }
 }
-/* 首页：一句话简介 + 联系方式 */
-/* 学校分两行显示 */
-.brand-description span,
+/* 关于卡片：学校分两行 */
 .profile-affiliation span {
   display: block;
 }
-.brand-description span + span,
 .profile-affiliation span + span {
   margin-top: 2px;
 }
@@ -933,4 +931,84 @@ button:focus-visible {
   color: var(--muted);
   font-size: 12px;
   vertical-align: 1px;
+}
+/* 侧栏搜索框（分类下面） */
+.site-search {
+  margin: 8px 0 0;
+}
+.site-search input {
+  width: 100%;
+  min-height: 38px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+.site-search input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* 搜索页 */
+.search-box {
+  padding: 24px 28px;
+}
+.search-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.search-status {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.search-results {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.search-results li {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.search-results li:first-child {
+  border-top: 0;
+}
+.search-results a {
+  color: var(--text);
+  font-size: 17px;
+  text-decoration: none;
+}
+.search-results a:hover {
+  color: var(--accent);
+}
+.search-results p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.search-results mark {
+  background: #fff1c2;
+  color: inherit;
+}
+
+/* 侧栏滚动时顶部品牌块保持可见 */
+.brand {
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }

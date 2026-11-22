@@ -83,3 +83,8 @@ other = "较早文章"
 other = "这篇笔记的正文还没生成，运行 npm run notes 后重试。"
 [articles]
 other = "文章"
+[search]
+other = "搜索"
+
+[wechat]
+other = "微信公众号"

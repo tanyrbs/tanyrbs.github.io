@@ -13,10 +13,7 @@
         <div class="sidebar-content">
           <a class="brand" href="{{ site.Home.RelPermalink }}">
             <span class="brand-title">{{ site.Title }}</span>
-            <span class="brand-description">
-              <span>{{ site.Params.affiliation }}</span>
-              <span>{{ site.Params.affiliationSecondary }}</span>
-            </span>
+            <span class="brand-description">{{ site.Params.tagline }}</span>
           </a>
           {{ partial "nav.html" . }}
           {{ partial "profile.html" . }}

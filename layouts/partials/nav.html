@@ -7,4 +7,7 @@
     <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "archives" }}</a>
   {{ end }}
   <a href="{{ "categories/" | relLangURL }}"{{ if or (in .RelPermalink "/categories/") (and (eq .Kind "term") (eq .Data.Plural "categories")) }} aria-current="page"{{ end }}>{{ i18n "categories" }}</a>
+  <form class="site-search" action="{{ "search/" | relURL }}" method="get" role="search">
+    <input type="search" name="q" placeholder="{{ i18n "searchPlaceholder" }}" aria-label="{{ i18n "search" }}" autocomplete="off">
+  </form>
 </nav>

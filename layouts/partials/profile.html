@@ -9,5 +9,6 @@
   <div class="profile-links">
     <a href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a>
     <a href="{{ site.Params.github }}" rel="me">github.com/tanyrbs</a>
+    {{ with site.Params.wechat }}<a href="{{ . }}" rel="me">{{ i18n "wechat" }}</a>{{ end }}
   </div>
 </section>

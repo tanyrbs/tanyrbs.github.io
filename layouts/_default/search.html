@@ -1,15 +1,63 @@
 {{ define "main" }}
-  <article class="article search-page" data-pagefind-ignore>
-    <header class="article-header">
-      <h1>{{ .Title }}</h1>
-      {{ with .Description }}<p>{{ . }}</p>{{ end }}
-    </header>
+  <article class="article-surface search-page" data-pagefind-ignore>
     <div class="search-box">
-      <pagefind-input placeholder="{{ i18n "searchPlaceholder" }}"></pagefind-input>
-      <pagefind-summary></pagefind-summary>
-      <pagefind-results show-sub-results></pagefind-results>
+      <input id="search-input" type="search" class="search-input"
+             placeholder="{{ i18n "searchPlaceholder" }}" aria-label="{{ i18n "search" }}"
+             autocomplete="off" spellcheck="false">
+      <p id="search-status" class="search-status" role="status"></p>
+      <ol id="search-results" class="search-results"></ol>
     </div>
   </article>
-  <link href="{{ "pagefind/pagefind-component-ui.css" | relURL }}" rel="stylesheet">
-  <script src="{{ "pagefind/pagefind-component-ui.js" | relURL }}" type="module"></script>
+
+  <script type="module">
+    import * as pagefind from "{{ "pagefind/pagefind.js" | relURL }}";
+
+    const input = document.getElementById("search-input");
+    const status = document.getElementById("search-status");
+    const list = document.getElementById("search-results");
+    const params = new URLSearchParams(location.search);
+    let timer = 0;
+    let latest = "";
+
+    const esc = (s) =>
+      String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+    async function run() {
+      const q = input.value.trim();
+      if (!q) {
+        status.textContent = "";
+        list.innerHTML = "";
+        return;
+      }
+      latest = q;
+      status.textContent = "搜索中…";
+      const search = await pagefind.search(q);
+      const data = await Promise.all(search.results.slice(0, 20).map((r) => r.data()));
+      if (latest !== q) return;
+      if (!data.length) {
+        status.textContent = "没有找到「" + q + "」相关的内容";
+        list.innerHTML = "";
+        return;
+      }
+      status.textContent = "找到 " + data.length + " 条结果";
+      list.innerHTML = data
+        .map((d) => {
+          const title = d.meta && d.meta.title ? d.meta.title : d.url;
+          return '<li><a href="' + d.url + '">' + esc(title) + "</a><p>" + d.excerpt + "</p></li>";
+        })
+        .join("");
+    }
+
+    input.addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = setTimeout(run, 180);
+    });
+
+    const initial = params.get("q");
+    if (initial) {
+      input.value = initial;
+      run();
+    }
+    input.focus();
+  </script>
 {{ end }}
