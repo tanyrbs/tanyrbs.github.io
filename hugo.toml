@@ -1,7 +1,7 @@
 baseURL = "https://tanyrbs.github.io/"
 enableGitInfo = true
 titleCaseStyle = "none"
-title = "blog的奇幻漂流"
+title = "blog的碎碎念"
 copyright = "(c) 2026 谭浩陶"
 enableRobotsTXT = true
 timeZone = "Asia/Shanghai"
