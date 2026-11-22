@@ -1,0 +1,18 @@
+<div class="sidebar-tabs" data-sidebar-tabs>
+  <div class="sidebar-tabs-head" role="tablist">
+    <button type="button" class="sidebar-tab is-active" role="tab" aria-selected="true" data-tab="toc">{{ i18n "tableOfContents" }}</button>
+    <button type="button" class="sidebar-tab" role="tab" aria-selected="false" data-tab="about">{{ i18n "about" }}</button>
+  </div>
+  <div class="sidebar-tabs-body">
+    <div class="sidebar-pane is-active" role="tabpanel" data-pane="toc">
+      <div class="reading-progress">
+        <span class="reading-progress-track"><span class="reading-progress-bar" data-progress-bar></span></span>
+        <span class="reading-progress-label" data-progress-label>0%</span>
+      </div>
+      <div class="sidebar-toc">{{ partial "article-toc.html" . }}</div>
+    </div>
+    <div class="sidebar-pane" role="tabpanel" data-pane="about" hidden>
+      {{ partial "profile-body.html" . }}
+    </div>
+  </div>
+</div>

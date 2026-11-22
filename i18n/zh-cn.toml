@@ -88,3 +88,5 @@ other = "搜索"
 
 [wechat]
 other = "微信公众号"
+[email]
+other = "邮箱"

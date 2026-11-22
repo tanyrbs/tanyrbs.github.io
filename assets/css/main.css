@@ -1049,3 +1049,162 @@ button:focus-visible {
   top: 0;
   z-index: 2;
 }
+/* 文章页侧栏：目录 / 关于 标签页 */
+.sidebar-tabs {
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.sidebar-tabs-head {
+  display: flex;
+  gap: 6px;
+  padding: 12px 14px 0;
+}
+.sidebar-tab {
+  flex: 1;
+  padding: 6px 4px 10px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+.sidebar-tab:hover {
+  color: var(--text);
+}
+.sidebar-tab.is-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.sidebar-tabs-body {
+  padding: 14px 16px 18px;
+}
+.sidebar-pane[hidden] {
+  display: none;
+}
+
+/* 阅读进度 */
+.reading-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.reading-progress-track {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #9aa0aa;
+}
+.reading-progress-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  background: #3f4551;
+}
+.reading-progress-label {
+  flex: none;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 侧栏里的目录 */
+.sidebar-toc {
+  font-size: 13px;
+  line-height: 1.65;
+}
+.sidebar-toc ul {
+  margin: 0;
+  padding-left: 1.1em;
+  list-style: none;
+}
+.sidebar-toc > ul,
+.sidebar-toc nav > ul {
+  padding-left: 0;
+}
+.sidebar-toc ul ul {
+  padding-left: 1em;
+}
+.sidebar-toc li {
+  margin: 3px 0;
+}
+.sidebar-toc a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.sidebar-toc a:hover {
+  color: var(--accent);
+}
+
+/* 关于卡片的图标链接 */
+.profile-icons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+.profile-icon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--muted);
+  background: var(--surface);
+}
+.profile-icon:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* 标签页里的关于：去掉卡片外观 */
+.sidebar-pane .profile-panel {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: center;
+}
+
+/* 宽屏时目录在侧栏，文章内的目录只在窄屏出现 */
+@media (min-width: 961px) {
+  .article-toc {
+    display: none;
+  }
+}
+/* 文章页：侧栏外壳固定，只有「目录」这一栏内部滚动 */
+@media (min-width: 961px) {
+  .site-sidebar.has-tabs {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .site-sidebar.has-tabs .sidebar-content {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+  .site-sidebar.has-tabs .sidebar-tabs {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+  .site-sidebar.has-tabs .sidebar-tabs-head {
+    flex: none;
+  }
+  .site-sidebar.has-tabs .sidebar-tabs-body {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}

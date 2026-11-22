@@ -24,14 +24,14 @@
 
     {{ if $latex }}
       {{ with os.ReadFile (path.Join "assets" "notes" $slug "toc.html") }}
-        <details class="toc lecture-toc" data-pagefind-ignore>
+        <details class="toc lecture-toc article-toc" data-pagefind-ignore>
           <summary>{{ i18n "tableOfContents" }}</summary>
           {{ . | safeHTML }}
         </details>
       {{ end }}
     {{ else if and site.Params.showToc .TableOfContents (eq .Section "blog") }}
       {{ if $lecture }}
-        <details class="toc lecture-toc" data-pagefind-ignore>
+        <details class="toc lecture-toc article-toc" data-pagefind-ignore>
           <summary>{{ i18n "tableOfContents" }}</summary>
           {{ .TableOfContents }}
         </details>

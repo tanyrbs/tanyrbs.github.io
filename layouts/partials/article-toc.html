@@ -1,0 +1,7 @@
+{{- $latex := .Params.latex -}}
+{{- $slug := .Params.slug | default .File.ContentBaseName -}}
+{{- if $latex -}}
+  {{- with os.ReadFile (path.Join "assets" "notes" $slug "toc.html") -}}{{ . | safeHTML }}{{- end -}}
+{{- else -}}
+  {{- .TableOfContents -}}
+{{- end -}}

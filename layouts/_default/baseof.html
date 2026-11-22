@@ -20,14 +20,19 @@
       </a>
     </header>
     <div class="site-layout">
-      <aside class="site-sidebar" id="site-sidebar">
+      {{ $isArticle := and (eq .Kind "page") (in (slice "blog" "notes") .Section) }}
+      <aside class="site-sidebar{{ if $isArticle }} has-tabs{{ end }}" id="site-sidebar">
         <div class="sidebar-content">
           <a class="brand" href="{{ site.Home.RelPermalink }}">
             <span class="brand-title">{{ site.Title }}</span>
             <span class="brand-description">{{ site.Params.tagline }}</span>
           </a>
           {{ partial "nav.html" . }}
-          {{ partial "profile.html" . }}
+          {{ if $isArticle }}
+            {{ partial "sidebar-tabs.html" . }}
+          {{ else }}
+            {{ partial "profile.html" . }}
+          {{ end }}
         </div>
       </aside>
       <main class="site-main" id="main-content">
