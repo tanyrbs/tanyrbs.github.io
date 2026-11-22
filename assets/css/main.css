@@ -910,3 +910,46 @@ button:focus-visible {
     gap: 10px;
   }
 }
+/* 首页：一句话简介 + 联系方式 */
+.home-heading {
+  margin-bottom: 1.4em;
+}
+.home-affiliation {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.home-intro {
+  font-size: 1.02rem;
+  line-height: 1.95;
+  max-width: 46rem;
+}
+.home-intro p {
+  margin: 0 0 1.2em;
+}
+.home-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 1.6em;
+  margin-bottom: 1.6em;
+}
+.home-links a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.home-links a:hover {
+  text-decoration: underline;
+}
+.home-sections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.2em;
+  font-size: 0.95rem;
+}
+.home-sections a {
+  color: var(--muted);
+  text-decoration: underline;
+}
+.home-sections a:hover {
+  color: var(--accent);
+}

@@ -25,9 +25,11 @@
       <main class="site-main" id="main-content">
         {{ block "main" . }}{{ end }}
       </main>
+      {{ if not .IsHome }}
       <aside class="site-rail" aria-label="{{ i18n "siteInformation" }}">
         {{ partial "right-rail.html" . }}
       </aside>
+      {{ end }}
       {{ partial "footer.html" . }}
     </div>
   </body>

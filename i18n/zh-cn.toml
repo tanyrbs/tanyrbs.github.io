@@ -168,3 +168,5 @@ other = "最后更新于"
 
 [noteBuildMissing]
 other = "这篇笔记的正文还没生成，运行 npm run notes 后重试。"
+[homeIntro]
+other = "这里记录数学、强化学习与大模型基础设施方面的学习笔记。笔记直接用 LaTeX 写，构建时编译成网页；短文仍用 Markdown。"

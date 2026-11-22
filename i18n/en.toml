@@ -171,3 +171,5 @@ other = "Last updated"
 
 [noteBuildMissing]
 other = "The rendered body is missing. Run npm run notes."
+[homeIntro]
+other = "Notes on mathematics, reinforcement learning and LLM infrastructure, written in LaTeX and compiled at build time."

@@ -10,9 +10,9 @@ defaultContentLanguage = "zh-cn"
 locale = "zh-CN"
 
 [params]
-  description = "谭浩陶，华东理工大学"
+  description = "谭浩陶，华东理工大学，香港中文大学（深圳）"
   author = "谭浩陶"
-  affiliation = "华东理工大学"
+  affiliation = "华东理工大学 · 香港中文大学（深圳）"
   email = "19003279@mail.ecust.edu.cn"
   github = "https://github.com/tanyrbs"
   repoURL = "https://github.com/tanyrbs/tanyrbs.github.io"

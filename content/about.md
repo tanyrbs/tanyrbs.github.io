@@ -1,16 +1,16 @@
 ---
 title: "关于谭浩陶"
-description: "谭浩陶，华东理工大学"
+description: "谭浩陶，华东理工大学，香港中文大学（深圳）"
 url: "/about/"
 aliases: ["/zh-cn/about/"]
 translationKey: "about"
 ---
 
-谭浩陶，华东理工大学。
+谭浩陶，华东理工大学，香港中文大学（深圳）。
 
 | 项目 | 信息 |
 | --- | --- |
 | 姓名 | 谭浩陶 |
-| 学校 | 华东理工大学 |
+| 学校 | 华东理工大学；香港中文大学（深圳） |
 | 邮箱 | [19003279@mail.ecust.edu.cn](mailto:19003279@mail.ecust.edu.cn) |
 | GitHub | [github.com/tanyrbs](https://github.com/tanyrbs) |
