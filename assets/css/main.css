@@ -940,11 +940,6 @@ button:focus-visible {
 .brand-description span + span,
 .profile-affiliation span + span {
   margin-top: 2px;
-  color: var(--muted);
-  font-size: 0.92em;
-}
-.profile-affiliation span:first-child {
-  color: var(--text);
 }
 /* 笔记列表：每个系列一个框 */
 .notes-series {
@@ -959,10 +954,18 @@ button:focus-visible {
   margin-bottom: 0;
 }
 .notes-series h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   font-size: 1.15rem;
   margin: 0 0 0.9em;
   padding-bottom: 0.5em;
   border-bottom: 1px solid var(--line);
+}
+.notes-series h2 .articles-count {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
 }
 .notes-series ol {
   margin: 0;
@@ -1043,4 +1046,13 @@ button:focus-visible {
   margin: 0 0 0.8em;
   padding-bottom: 0.45em;
   border-bottom: 1px solid var(--line);
+}
+.item-kind {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--muted);
+  font-size: 12px;
+  vertical-align: 1px;
 }

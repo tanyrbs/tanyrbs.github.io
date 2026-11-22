@@ -1,15 +1,6 @@
 {{ define "main" }}
   {{ $catalog := partial "blog-catalog.html" . }}
   {{ $groups := $catalog.posts.GroupByDate "2006" "desc" }}
-  <header class="page-header">
-    <h1>{{ .Title }}</h1>
-    {{ with .Description }}<p>{{ . }}</p>{{ end }}
-    <p class="catalog-stats">{{ i18n "postCount" (len $catalog.posts) }} · {{ i18n "categoryCount" (len $catalog.categories) }}</p>
-    <div class="catalog-actions">
-      {{ with site.GetPage "/categories" }}<a href="{{ .RelPermalink }}">{{ i18n "browseCategories" }} →</a>{{ end }}
-      {{ with site.GetPage "/search" }}<a href="{{ .RelPermalink }}">{{ i18n "search" }} →</a>{{ end }}
-    </div>
-  </header>
 
   {{ with $groups }}
     <nav class="year-nav" aria-label="{{ i18n "browseByYear" }}">

@@ -1,54 +1,47 @@
 {{ define "main" }}
-  {{ $notes := where site.RegularPages "Section" "notes" }}
-  {{ $posts := where site.RegularPages "Section" "blog" }}
+  {{ $pages := where site.RegularPages "Section" "in" (slice "blog" "notes") }}
+  {{ $order := slice }}
+  {{ $groups := dict }}
+  {{ range $pages }}
+    {{ $key := .Params.lectureSeries | default "" }}
+    {{ if not (in $order $key) }}{{ $order = $order | append $key }}{{ end }}
+    {{ $existing := index $groups $key | default slice }}
+    {{ $groups = merge $groups (dict $key ($existing | append .)) }}
+  {{ end }}
 
-  <header class="page-header">
-    <h1>{{ .Title }}</h1>
-    {{ with .Description }}<p>{{ . }}</p>{{ end }}
-  </header>
+  {{ $series := slice }}
+  {{ range $order }}{{ if . }}{{ $series = $series | append . }}{{ end }}{{ end }}
+  {{ $series = sort $series }}
 
-  <section class="articles-block" aria-labelledby="articles-notes">
-    <h2 id="articles-notes" class="articles-heading">{{ i18n "notes" }}<span class="articles-count">{{ len $notes }}</span></h2>
-    {{ $seriesOrder := slice }}
-    {{ $groups := dict }}
-    {{ range $notes }}
-      {{ $key := .Params.lectureSeries | default "" }}
-      {{ if not (in $seriesOrder $key) }}
-        {{ $seriesOrder = $seriesOrder | append $key }}
-      {{ end }}
-      {{ $existing := index $groups $key | default slice }}
-      {{ $groups = merge $groups (dict $key ($existing | append .)) }}
-    {{ end }}
+  {{ range $series }}
+    {{ $items := index $groups . }}
+    {{ $items = sort $items "Params.lectureNumber" }}
+    <section class="notes-series">
+      <h2>{{ . }}<span class="articles-count">{{ len $items }}</span></h2>
+      <ol>
+        {{ range $items }}
+          <li>
+            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            {{ if eq .Section "blog" }}<span class="item-kind">短文</span>{{ end }}
+            {{ with .Params.description }}<span class="notes-series-desc"> — {{ . }}</span>{{ end }}
+          </li>
+        {{ end }}
+      </ol>
+    </section>
+  {{ end }}
 
-    {{ range $seriesOrder }}
-      {{ $items := index $groups . }}
-      {{ $items = sort $items "Params.lectureNumber" }}
-      <section class="notes-series">
-        <h3>{{ if . }}{{ . }}{{ else }}{{ i18n "uncategorized" }}{{ end }}</h3>
-        <ol>
-          {{ range $items }}
-            <li>
-              <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-              {{ with .Params.description }}<span class="notes-series-desc"> — {{ . }}</span>{{ end }}
-            </li>
-          {{ end }}
-        </ol>
-      </section>
-    {{ end }}
-  </section>
-
-  {{ with $posts }}
-    <section class="articles-block" aria-labelledby="articles-posts">
-      <h2 id="articles-posts" class="articles-heading">{{ i18n "blog" }}<span class="articles-count">{{ len . }}</span></h2>
-      <ul class="articles-list">
+  {{ with index $groups "" }}
+    <section class="notes-series">
+      <h2>{{ i18n "uncategorized" }}<span class="articles-count">{{ len . }}</span></h2>
+      <ol>
         {{ range .ByDate.Reverse }}
           <li>
             <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
-            {{ with .Description }}<p>{{ . }}</p>{{ end }}
+            {{ if eq .Section "blog" }}<span class="item-kind">短文</span>{{ end }}
+            {{ with .Params.description }}<span class="notes-series-desc"> — {{ . }}</span>{{ end }}
           </li>
         {{ end }}
-      </ul>
+      </ol>
     </section>
   {{ end }}
 {{ end }}

@@ -3,21 +3,6 @@
   {{ $isNotes := eq .Section "notes" }}
   {{ $posts := .Pages.ByDate.Reverse }}
   {{ if $isCategory }}{{ $posts = (where .Pages "Section" "blog").ByDate.Reverse }}{{ end }}
-  <header class="page-header">
-    <h1>{{ .Title }}</h1>
-    {{ with .Description }}<p>{{ . }}</p>{{ end }}
-    {{ if or $isCategory (eq .Section "blog") $isNotes }}
-      <p class="catalog-stats">
-        {{ if $isNotes }}{{ i18n "noteCount" (len $posts) }}{{ else }}{{ i18n "postCount" (len $posts) }}{{ end }}
-      </p>
-      {{ if or $isCategory (eq .Section "blog") }}
-        <div class="catalog-actions">
-          {{ with site.GetPage "/archives" }}<a href="{{ .RelPermalink }}">{{ i18n "archives" }} →</a>{{ end }}
-          {{ with site.GetPage "/categories" }}<a href="{{ .RelPermalink }}">{{ if $isCategory }}← {{ i18n "backToCategories" }}{{ else }}{{ i18n "browseCategories" }} →{{ end }}</a>{{ end }}
-        </div>
-      {{ end }}
-    {{ end }}
-  </header>
 
   <section class="post-list" aria-label="{{ .Title }}">
     {{ range $posts }}

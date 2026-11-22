@@ -1,14 +1,6 @@
 {{ define "main" }}
   {{ $isCategories := eq .Data.Plural "categories" }}
   {{ $catalog := partial "blog-catalog.html" . }}
-  <header class="page-header">
-    <h1>{{ .Title }}</h1>
-    {{ with .Description }}<p>{{ . }}</p>{{ end }}
-    {{ if $isCategories }}
-      <p class="catalog-stats">{{ i18n "categoryCount" (len $catalog.categories) }} · {{ i18n "postCount" (len $catalog.posts) }}</p>
-      {{ with site.GetPage "/archives" }}<div class="catalog-actions"><a href="{{ .RelPermalink }}">{{ i18n "archives" }} →</a></div>{{ end }}
-    {{ end }}
-  </header>
   {{ if $isCategories }}
     <section class="category-grid" aria-label="{{ .Title }}">
       {{ range $catalog.categories }}
