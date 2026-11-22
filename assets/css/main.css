@@ -972,3 +972,75 @@ button:focus-visible {
 .notes-series-desc {
   color: var(--muted);
 }
+/* 首页搜索 */
+.home-search {
+  padding: 20px 24px 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.home-search pagefind-input,
+.home-search pagefind-results {
+  --pagefind-ui-font: inherit;
+}
+.home-search pagefind-summary,
+.home-search pagefind-results {
+  display: block;
+  margin-top: 12px;
+}
+
+/* 合并页：笔记 + 短文 */
+.articles-block {
+  margin-bottom: 28px;
+}
+.articles-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-size: 20px;
+  font-weight: 400;
+}
+.articles-count {
+  color: var(--muted);
+  font-size: 14px;
+}
+.articles-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.articles-list li {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.articles-list li:first-child {
+  border-top: 0;
+}
+.articles-list a {
+  color: var(--text);
+  font-size: 17px;
+  text-decoration: none;
+}
+.articles-list a:hover {
+  color: var(--accent);
+}
+.articles-list time {
+  margin-left: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.articles-list p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.notes-series h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.8em;
+  padding-bottom: 0.45em;
+  border-bottom: 1px solid var(--line);
+}

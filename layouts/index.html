@@ -4,6 +4,14 @@
     <p>{{ site.Params.description }}</p>
   </header>
 
+  <section class="home-search" aria-label="{{ i18n "search" }}" data-pagefind-ignore>
+    <pagefind-input placeholder="{{ i18n "searchPlaceholder" }}"></pagefind-input>
+    <pagefind-summary></pagefind-summary>
+    <pagefind-results show-sub-results></pagefind-results>
+  </section>
+  <link href="{{ "pagefind/pagefind-component-ui.css" | relURL }}" rel="stylesheet">
+  <script src="{{ "pagefind/pagefind-component-ui.js" | relURL }}" type="module"></script>
+
   {{ $posts := where site.RegularPages "Section" "in" (slice "blog" "notes") }}
   <section class="post-list" aria-label="{{ i18n "recentPosts" }}">
     {{ range first 8 ($posts.ByDate.Reverse) }}

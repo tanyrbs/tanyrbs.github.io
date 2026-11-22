@@ -1,21 +1,10 @@
 <nav class="site-nav" aria-label="{{ i18n "siteNavigation" }}">
   <a href="{{ site.Home.RelPermalink }}"{{ if .IsHome }} aria-current="page"{{ end }}>{{ i18n "home" }}</a>
-  {{ with site.GetPage "section" "blog" }}
-    <a href="{{ .RelPermalink }}"{{ if eq $.Section "blog" }} aria-current="page"{{ end }}>{{ i18n "blog" }}</a>
-  {{ end }}
-  {{ with site.GetPage "section" "notes" }}
-    <a href="{{ .RelPermalink }}"{{ if eq $.Section "notes" }} aria-current="page"{{ end }}>{{ i18n "notes" }}</a>
+  {{ with site.GetPage "/articles" }}
+    <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "articles" }}</a>
   {{ end }}
   {{ with site.GetPage "/archives" }}
     <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "archives" }}</a>
   {{ end }}
   <a href="{{ "categories/" | relLangURL }}"{{ if or (in .RelPermalink "/categories/") (and (eq .Kind "term") (eq .Data.Plural "categories")) }} aria-current="page"{{ end }}>{{ i18n "categories" }}</a>
-  <a href="{{ "tags/" | relLangURL }}"{{ if in .RelPermalink "/tags/" }} aria-current="page"{{ end }}>{{ i18n "tags" }}</a>
-  {{ with site.GetPage "page" "about" }}
-    <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "about" }}</a>
-  {{ end }}
-  {{ with site.GetPage "page" "search" }}
-    <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "search" }}</a>
-  {{ end }}
-  <a href="{{ site.Params.github }}" rel="me">{{ i18n "github" }}</a>
 </nav>
