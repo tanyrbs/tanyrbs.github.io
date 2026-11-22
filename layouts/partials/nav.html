@@ -1,12 +1,24 @@
 <nav class="site-nav" aria-label="{{ i18n "siteNavigation" }}">
-  <a href="{{ site.Home.RelPermalink }}"{{ if .IsHome }} aria-current="page"{{ end }}>{{ i18n "home" }}</a>
+  <a href="{{ site.Home.RelPermalink }}"{{ if .IsHome }} aria-current="page"{{ end }}>
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2.6 2.7 10.4a1 1 0 0 0 .64 1.77H5v7.73A1.1 1.1 0 0 0 6.1 21H9.6v-5.3h4.8V21h3.5a1.1 1.1 0 0 0 1.1-1.1v-7.73h1.66a1 1 0 0 0 .64-1.77Z"/></svg>
+    <span>{{ i18n "home" }}</span>
+  </a>
   {{ with site.GetPage "/articles" }}
-    <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "articles" }}</a>
+    <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M13.5 2H6.2A1.2 1.2 0 0 0 5 3.2v17.6A1.2 1.2 0 0 0 6.2 22h11.6a1.2 1.2 0 0 0 1.2-1.2V7.5Zm0 2.4L17.1 8h-3.6ZM8.5 11h7v1.8h-7Zm0 3.6h7v1.8h-7Zm0 3.6h4.5v1.8H8.5Z"/></svg>
+      <span>{{ i18n "articles" }}</span>
+    </a>
   {{ end }}
   {{ with site.GetPage "/archives" }}
-    <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>{{ i18n "archives" }}</a>
+    <a href="{{ .RelPermalink }}"{{ if eq $.RelPermalink .RelPermalink }} aria-current="page"{{ end }}>
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2.4A9.6 9.6 0 1 0 21.6 12 9.6 9.6 0 0 0 12 2.4Zm0 2.1a7.5 7.5 0 1 1 0 15 7.5 7.5 0 0 1 0-15Zm-.95 2.6v5.2l4.1 2.45 1-1.65-3.2-1.9V7.1Z"/><path fill="currentColor" d="M10.05 18.2h3.9v1.6h-3.9Z" opacity=".0"/></svg>
+      <span>{{ i18n "archives" }}</span>
+    </a>
   {{ end }}
-  <a href="{{ "categories/" | relLangURL }}"{{ if or (in .RelPermalink "/categories/") (and (eq .Kind "term") (eq .Data.Plural "categories")) }} aria-current="page"{{ end }}>{{ i18n "categories" }}</a>
+  <a href="{{ "categories/" | relLangURL }}"{{ if or (in .RelPermalink "/categories/") (and (eq .Kind "term") (eq .Data.Plural "categories")) }} aria-current="page"{{ end }}>
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 3h8v8H3Zm10 0h8v8h-8ZM3 13h8v8H3Zm10 0h8v8h-8Z"/></svg>
+    <span>{{ i18n "categories" }}</span>
+  </a>
   <form class="site-search" action="{{ "search/" | relURL }}" method="get" role="search">
     <input type="search" name="q" placeholder="{{ i18n "searchPlaceholder" }}" aria-label="{{ i18n "search" }}" autocomplete="off">
   </form>

@@ -129,11 +129,26 @@ button:focus-visible {
 }
 
 .site-nav a {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 8px 10px;
   border-left: 3px solid transparent;
   color: var(--muted);
   line-height: 1.4;
+  text-decoration: none;
+}
+
+.nav-icon {
+  width: 19px;
+  height: 19px;
+  flex: none;
+  color: #4b5563;
+}
+
+.site-nav a:hover .nav-icon,
+.site-nav a[aria-current="page"] .nav-icon {
+  color: var(--accent);
 }
 
 .site-nav a:hover {
