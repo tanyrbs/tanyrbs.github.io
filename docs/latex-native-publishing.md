@@ -1,5 +1,7 @@
 # LaTeX 笔记直接发布到网站：方案调研
 
+> **实施更新（2026-11-22）**：仓库最终采用路线 A（make4ht + LuaLaTeX + KaTeX MathML），源目录为 `latex/<slug>/main.tex`，构建命令见 README。第 0.5 节提到的 Tectonic + Pandoc 原型已经移除，保留这一节是为了记录当时的取舍。
+>
 > 结论先行：**可行，而且不需要"转换器"**。把 `.tex` 当唯一源文件，在 CI 里用真正的 TeX 引擎编译成 HTML（或 PDF），网站只负责外壳。
 > 本文所有数字都是在本机（TeX Live 2025 + Windows）拿**你的真实笔记**跑出来的，不是查文档得来的。
 

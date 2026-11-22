@@ -1,0 +1,227 @@
+% 版式
+\usepackage{geometry}
+\geometry{
+  a4paper,
+  margin=2.5cm,
+  headheight=14pt,
+}
+
+% 主题色（克制、印刷友好）
+\usepackage{xcolor}
+\definecolor{themeaccent}{HTML}{1a5f7a}
+\definecolor{themecolorthm}{HTML}{1a5f7a}
+\definecolor{themecolordef}{HTML}{2d6a4f}
+\definecolor{themecolorremark}{HTML}{8b6914}
+
+% 定理块底纹浓度（xcolor：数字越大底色越深；旧版约 !4–!6，此处加深便于对比）
+\newcommand{\thmshadecolor}{themecolorthm!18}
+\newcommand{\defshadecolor}{themecolordef!14}
+\newcommand{\remarkshadecolor}{themecolorremark!12}
+
+% 数学
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage[anycase]{thmtools}
+\usepackage{bm}
+
+% 行距（可读性）
+\usepackage{setspace}
+\onehalfspacing
+
+% 页眉页脚
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{themeaccent!70!black}\nouppercase{\leftmark}}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\color{themeaccent!50!black}\hrule height 0.4pt}
+
+% 章节标题着色 + 装饰线（ctex）
+\ctexset{
+  section/format     = \Large\bfseries\color{themeaccent},
+  section/aftername  = \hspace{0.5em},
+  section/aftertitle = \par\vspace{-4pt}%
+    {\color{themeaccent!40}\rule{\linewidth}{0.5pt}}\vspace{4pt},
+  subsection/format  = \large\bfseries\color{themeaccent!88!black},
+}
+
+% 常用配对符号（mathtools）
+\DeclarePairedDelimiter{\paren}{(}{)}
+\DeclarePairedDelimiter{\sqbrk}{[}{]} % 勿用 \brack，与内核冲突
+\DeclarePairedDelimiter{\curlbrace}{\{}{\}} % 勿用 \brace，与内核冲突
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+
+% 定理样式：彩色标题（底纹在 \declaretheorem 中用 shaded 指定）
+\declaretheoremstyle[
+  spaceabove=6pt,
+  spacebelow=6pt,
+  headfont=\bfseries\color{themecolorthm},
+  notefont=\bfseries\color{themecolorthm!80!black},
+  bodyfont=\itshape,
+  headpunct={.},
+  postheadspace=0.5em,
+]{styletheorem}
+
+\declaretheoremstyle[
+  spaceabove=6pt,
+  spacebelow=6pt,
+  headfont=\bfseries\color{themecolordef},
+  notefont=\bfseries\color{themecolordef!80!black},
+  bodyfont=\normalfont,
+  headpunct={.},
+  postheadspace=0.5em,
+]{styledefinition}
+
+\declaretheoremstyle[
+  spaceabove=6pt,
+  spacebelow=6pt,
+  headfont=\bfseries\color{themecolorremark},
+  notefont=\bfseries\color{themecolorremark!80!black},
+  bodyfont=\normalfont,
+  headpunct={.},
+  postheadspace=0.5em,
+]{styleremark}
+
+\declaretheorem[
+  style=styletheorem,
+  name=定理,
+  numberwithin=section,
+  shaded={bgcolor=\thmshadecolor, margin=0pt},
+]{theorem}
+
+\declaretheorem[
+  style=styletheorem,
+  name=引理,
+  sibling=theorem,
+  shaded={bgcolor=\thmshadecolor, margin=0pt},
+]{lemma}
+
+\declaretheorem[
+  style=styletheorem,
+  name=命题,
+  sibling=theorem,
+  shaded={bgcolor=\thmshadecolor, margin=0pt},
+]{proposition}
+
+\declaretheorem[
+  style=styletheorem,
+  name=推论,
+  sibling=theorem,
+  shaded={bgcolor=\thmshadecolor, margin=0pt},
+]{corollary}
+
+\declaretheorem[
+  style=styledefinition,
+  name=定义,
+  sibling=theorem,
+  shaded={bgcolor=\defshadecolor, margin=0pt},
+]{definition}
+
+\declaretheorem[
+  style=styleremark,
+  name=注,
+  sibling=theorem,
+  shaded={bgcolor=\remarkshadecolor, margin=0pt},
+]{remark}
+
+\renewcommand{\proofname}{\textcolor{themecolorthm}{证明}}
+\renewcommand{\qedsymbol}{\textcolor{themecolorthm}{$\blacksquare$}}
+
+% 彩色标题页（替代 \maketitle）
+\makeatletter
+\newcommand{\maketitlecolored}{%
+  \begin{center}\leavevmode
+    {\LARGE\bfseries\color{themeaccent}\@title\par}
+    \vspace{0.8em}
+    {\large\@author\par}
+    {\normalsize\color{black!55}\@date\par}
+  \end{center}
+  \vspace{1.8em}%
+}
+\makeatother
+
+% 表格（专业三线表）
+\usepackage{booktabs}
+
+% 图表标题样式
+\usepackage{caption}
+\captionsetup{labelfont={bf,color=themeaccent}, labelsep=period, font=small}
+
+% 链接（置于 preamble 末尾）
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=themeaccent!90!black,
+  citecolor=themecolordef!75!black,
+  urlcolor=themeaccent,
+}
+
+% 智能交叉引用（须在 hyperref 之后加载）
+\usepackage{cleveref}
+\crefname{theorem}{定理}{定理}
+\crefname{lemma}{引理}{引理}
+\crefname{proposition}{命题}{命题}
+\crefname{corollary}{推论}{推论}
+\crefname{definition}{定义}{定义}
+\crefname{remark}{注}{注}
+\crefformat{equation}{式~(#2#1#3)}
+
+% ============================================================
+% 以下为本文（verl 笔记）额外追加的部分，上面的模板内容未作改动
+% ============================================================
+
+% 插图
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+
+% ------------------------------------------------------------
+% 深层编号列表：原笔记有 4–6 层 tab 缩进。
+% enumitem 内置的 enumerate 被 \thr@@(=4) 限制，单靠 \setlistdepth 不够，
+% 故用 \newlist 定义一个 max-depth=9 的 enum 列表环境。
+% ------------------------------------------------------------
+\usepackage{enumitem}
+\setlistdepth{9}
+% 用 \renewlist 重定义标准的 enumerate / itemize，把深度上限从 4 提到 9，
+% 这样正文里原有的 \begin{enumerate} 无需逐个改名。
+\renewlist{enumerate}{enumerate}{9}
+\setlist[enumerate,1]{label=\arabic*., leftmargin=2em, itemsep=2pt, topsep=4pt}
+\setlist[enumerate,2]{label=(\arabic*), leftmargin=2em, itemsep=2pt, topsep=3pt}
+\setlist[enumerate,3]{label=\roman*., leftmargin=2em, itemsep=1pt, topsep=2pt}
+\setlist[enumerate,4]{label=\alph*., leftmargin=2em, itemsep=1pt, topsep=2pt}
+\setlist[enumerate,5]{label=\textbullet, leftmargin=1.6em, itemsep=1pt, topsep=2pt}
+\setlist[enumerate,6]{label=--, leftmargin=1.6em, itemsep=1pt, topsep=2pt}
+\setlist[enumerate,7]{label=$\cdot$, leftmargin=1.6em, itemsep=1pt, topsep=2pt}
+\setlist[enumerate,8]{label=$\ast$, leftmargin=1.6em, itemsep=1pt, topsep=2pt}
+\setlist[enumerate,9]{label=$\circ$, leftmargin=1.6em, itemsep=1pt, topsep=2pt}
+\renewlist{itemize}{itemize}{9}
+\setlist[itemize,1]{label=\textbullet, leftmargin=2em, itemsep=2pt, topsep=3pt}
+\setlist[itemize,2]{label=--, leftmargin=2em, itemsep=1pt, topsep=2pt}
+\setlist[itemize,3]{label=$\cdot$, leftmargin=1.6em, itemsep=1pt, topsep=2pt}
+
+% ------------------------------------------------------------
+% 行内代码：\detokenize 把 _ % & # 等一律转成「其它」字符再排版，
+% 不会触发数学下标或注释。注意参数里不要放中文（中文移到 \code 外面）；
+% 也不要放 Unicode 数学符号（等宽字体缺字形，改用 LaTeX 命令或 ASCII）。
+% ------------------------------------------------------------
+\newcommand{\code}[1]{{\ttfamily\detokenize{#1}}}
+
+% 新增内容标记：灰字 + 【补充】标签，与原文在视觉上可区分
+% 用 \color 分组而不是 \textcolor{...}{...}：后者把段落放进参数里，
+% make4ht/tex4ht 会报 "Argument of \c:HColor: has an extra }"。
+\newcommand{\note}[1]{\par\smallskip\noindent
+  \textbf{【补充】}~#1\par\smallskip}
+% 行内新增内容标记（不另起段）
+\newcommand{\inlinenote}[1]{〔补充：#1〕}
+% 表格中换行
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% 符号简写（\mathbb 由 amssymb 提供）
+\newcommand{\KL}{\mathrm{KL}}
+\newcommand{\GAE}{\mathrm{GAE}}
+\newcommand{\R}{\mathbb{E}}
+% Unicode 圈号：Latin 字体没有，用带圈数字代替
+\newcommand{\stagenum}[1]{\textcircled{\scriptsize #1}}

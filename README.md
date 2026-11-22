@@ -8,6 +8,7 @@
 |---|---|
 | `latex/<slug>/main.tex` | 笔记源文件（就是 Overleaf 里的那份），**唯一内容源** |
 | `latex/<slug>/preamble.tex` | 该笔记的导言区（ctexart + amsmath + thmtools） |
+| `latex/<slug>/figures/` | 笔记里的插图，编译后自动拷到 `static/notes/<slug>/figures/` |
 | `content/blog/*.md` | 手写的短文（Markdown） |
 | `content/notes/<slug>/index.md` | 由脚本生成，只有 frontmatter，不要手改 |
 | `assets/notes/<slug>/body.html` | 由脚本生成，编译后的正文 |
@@ -30,16 +31,20 @@
 
 3. 本地跑 `npm run notes`，再 `npm run site`，或者一步到位 `npm run publish`。
 
+已有的三篇：`rl-ppo`、`rl-rlhf-dpo`、`verl-note`。带插图的笔记把图片放在同目录的 `figures/` 下，
+用 `\includegraphics{figures/xxx.png}` 引用即可，构建时会搬到 `static/notes/<slug>/`。
+
 ## 常用命令
 
 ```bash
+npm ci             # 安装 KaTeX 等构建依赖
 npm run notes      # 编译所有 .tex + KaTeX 渲染正文，生成 content/notes 与 assets/notes
 npm run site       # hugo --minify --gc
 npm run search     # pagefind 建搜索索引
 npm run publish    # notes + site + search
 ```
 
-本地预览：`npm run notes && hugo server -D`
+本地预览：`npm ci && npm run notes && hugo server -D`
 
 ## 依赖
 
@@ -70,6 +75,9 @@ content/notes/<slug>/index.md + assets/notes/<slug>/body.html
       ▼
 public/  →  pagefind  →  GitHub Pages
 ```
+
+选型调研、make4ht 的两个坑，以及 PDF / lwarp / LaTeXML 等路线的实测对比见
+[`docs/latex-native-publishing.md`](docs/latex-native-publishing.md)。
 
 ## GitHub Pages
 

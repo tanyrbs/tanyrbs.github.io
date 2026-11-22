@@ -164,3 +164,56 @@
   border-bottom: 1px solid var(--line);
 }
 .notes-series ol { margin: 0; padding-left: 1.3em; line-height: 1.9; }
+/* tex4ht 的 \begin{center} 与插图 */
+.latex-note .center {
+  text-align: center;
+  margin: 1.2em 0;
+}
+.latex-note img {
+  max-width: 100%;
+  height: auto;
+  margin: 0.6em auto;
+  display: block;
+}
+/* tex4ht 把 enumitem 的列表排成 dl/dt/dd：把标签左浮动、限制嵌套缩进 */
+.latex-note dl {
+  margin: 0 0 0.85em;
+}
+.latex-note dl > dt {
+  float: left;
+  margin: 0 0.4em 0 0;
+  min-width: 1.4em;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.latex-note dl > dd {
+  margin: 0 0 0.3em 2.1em;
+}
+.latex-note dl > dd::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.latex-note dl dl {
+  margin-left: 0.2em;
+}
+.latex-note dl dl > dd {
+  margin-left: 1.6em;
+}
+.latex-note dl dl dl > dd {
+  margin-left: 1.4em;
+}
+/* 圈号阶段的文字替身 */
+.latex-note .stage-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.45em;
+  height: 1.45em;
+  margin: 0 0.15em;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  font-size: 0.8em;
+  vertical-align: 0.1em;
+}

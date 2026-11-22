@@ -1,5 +1,6 @@
 baseURL = "https://tanyrbs.github.io/"
 enableGitInfo = true
+titleCaseStyle = "none"
 title = "谭浩陶"
 copyright = "(c) 2026 谭浩陶"
 enableRobotsTXT = true

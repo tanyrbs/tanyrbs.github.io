@@ -52,6 +52,22 @@ function compileOne(slug) {
     // 网页里这点行距无所谓，编译前统一去掉。
     let tex = fs.readFileSync(texFile, "utf8")
     tex = tex.replace(/\\\\\s*\[[^\]]*\]/g, "\\\\")
+    // 标题与目录由 Hugo 页面提供，避免页面上出现两份
+    tex = tex.replace(/\\maketitlecolored\b/g, "")
+    tex = tex.replace(/\\tableofcontents\b/g, "")
+    // tex4ht 的 textcolor 实现遇到"跨段落的着色参数"会直接报错（\note{} 那种写法），
+    // 网页里不需要这层灰色，替换成不带颜色的版本。
+    if (!tex.includes("@@note-webpatch@@")) {
+      const patch = [
+        "% @@note-webpatch@@",
+        "\\makeatletter",
+        "\\@ifundefined{note}{}{\\renewcommand{\\note}[1]{\\par\\noindent\\textbf{【补充】}~#1\\par}}",
+        "\\@ifundefined{inlinenote}{}{\\renewcommand{\\inlinenote}[1]{（补充：#1）}}",
+        "\\makeatother",
+        "",
+      ].join("\n")
+      tex = tex.replace(/\\begin\{document\}/, patch + "\\begin{document}")
+    }
     fs.writeFileSync(texFile, tex, "utf8")
     try {
       execFileSync("make4ht", ["-l", "-f", "html5", "-d", "html", "note.tex", MATH_OPT], {
