@@ -12,7 +12,7 @@
       data-reactions-enabled="{{ $giscus.reactionsEnabled | default "1" }}"
       data-emit-metadata="{{ $giscus.emitMetadata | default "0" }}"
       data-input-position="{{ $giscus.inputPosition | default "bottom" }}"
-      data-theme="{{ $giscus.theme | default "preferred_color_scheme" }}"
+      data-theme="{{ $giscus.theme | default "light" }}"
       data-lang="{{ site.Params.giscusLang | default $giscus.lang | default site.Language.Lang }}"
       crossorigin="anonymous"
       async>

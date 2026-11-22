@@ -97,8 +97,6 @@ other = "阅读全文"
 [menu]
 other = "菜单"
 
-[darkMode]
-other = "切换深色模式"
 
 [siteInformation]
 other = "站点信息"

@@ -99,8 +99,6 @@ other = "Read more"
 [menu]
 other = "Menu"
 
-[darkMode]
-other = "Toggle dark mode"
 
 [siteInformation]
 other = "Site information"
