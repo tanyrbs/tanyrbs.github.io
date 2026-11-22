@@ -1,0 +1,36 @@
+\documentclass[UTF8,fontset=fandol]{ctexart}
+
+\input{preamble}
+
+\title{__TITLE__}
+\author{}
+\date{}
+
+\begin{document}
+\maketitlecolored
+
+\section{第一节}
+
+正文段落。行内公式这么写：$f(x) = \lim_{h\to 0}\frac{f(x+h)-f(x)}{h}$。
+
+\subsection{小节}
+
+行间公式单独成段：
+
+\[
+\nabla_\theta J(\pi_\theta) = \mathbb{E}_{\tau\sim\pi_\theta}\bigl[\nabla_\theta \log P(\tau\mid\pi_\theta)\, R(\tau)\bigr].
+\]
+
+\begin{theorem}[示例]
+定理环境可以直接用，网页上会渲染成带左边线的块。
+\end{theorem}
+
+\begin{definition}
+定义环境同理。
+\end{definition}
+
+\section{小结}
+
+写完后 \texttt{npm run publish} 本地预览，或直接推上去让 CI 编译。
+
+\end{document}

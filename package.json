@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Hugo blog with LaTeX-compiled notes",
   "scripts": {
+    "note:new": "node scripts/latex/new-note.mjs",
     "notes:compile": "node scripts/latex/compile.mjs",
     "notes:post": "node scripts/latex/postprocess.mjs",
     "notes": "npm run notes:compile && npm run notes:post",

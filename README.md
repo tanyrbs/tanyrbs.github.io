@@ -47,7 +47,8 @@ docs/                  历史调研（Quartz 分析、LaTeX 发布方案），�
 ```bash
 npm ci                     # 首次：装 KaTeX 等构建依赖
 
-node scripts/hugo.mjs new content/blog/my-post.md   # 按骨架新建文章
+node scripts/hugo.mjs new content/blog/my-post.md   # 按骨架新建 Markdown 文章
+npm run note:new -- <slug> --title "标题"           # 新建 LaTeX 笔记骨架
 node scripts/hugo.mjs server -D                     # 本地预览 http://localhost:1313
 
 npm run notes              # 编译 latex/ 下的笔记 + 渲染公式，生成 content/notes 与 assets/notes
@@ -145,6 +146,39 @@ tags: []
 ```
 
 写完后把 `draft` 改 `false`，`git push` 即可。
+
+## 发布一篇新笔记
+
+### 三步走（不需要本地装 TeX）
+
+```bash
+# 1) 生成骨架：latex/<slug>/{main.tex,preamble.tex,figures/}
+npm run note:new -- rl-dpo --title "DPO 推导" --series "强化学习" --number 3 \
+     --tags "强化学习,DPO" --description "一句话摘要"
+
+# 2) 把 Overleaf 里的正文贴进 main.tex（保留文件顶部的 %! 元数据）
+
+# 3) 推送，CI 用 texlive 容器编译并部署（约 2–4 分钟）
+git add latex/rl-dpo && git commit -m "add note: rl-dpo" && git push
+```
+
+`npm run note:new` 只生成文件，不编译；生成的 `preamble.tex` 是通用数学模板
+（ctexart + amsmath + thmtools + 定理/定义/注环境），需要别的宏包直接往里加。
+
+想本地看效果（需要装 TeX Live + Node）：
+
+```bash
+npm ci
+npm run publish      # 编译 + 构建 + 搜索索引
+npm run serve        # http://localhost:1313 实时预览
+```
+
+### 在 Overleaf 里怎么写
+
+- 模板就是 `scripts/latex/template/main.tex` + `preamble.tex`，Overleaf 里直接用这两份；
+- 写完从 Overleaf 下载 `main.tex`（和改过的 `preamble.tex`），覆盖 `latex/<slug>/` 里的同名文件；
+- 图片放 `latex/<slug>/figures/`，正文用 `\includegraphics{figures/x.png}`；
+- **不要删 `main.tex` 顶部的 `%!` 注释**——标题、日期、系列、标签都从这几行读。
 
 ## 写一篇 LaTeX 笔记
 
