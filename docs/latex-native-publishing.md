@@ -1,5 +1,9 @@
 # LaTeX 笔记直接发布到网站：方案调研
 
+> **实施补记**：tex4ht 的公式包裹标签随 TeX Live 版本变化——本地是 `<div class='mathjax-block'>`，
+> CI 容器里是 `<span class='mathjax-block'>`，环境型公式是 `<span class='mathjax-env mathjax-align*'>`。
+> 转换脚本要同时认这几种写法，否则线上会漏掉公式、把 TeX 源码直接显示出来。
+>
 > **实施更新（2026-11-22）**：仓库最终采用路线 A（make4ht + LuaLaTeX + KaTeX MathML），源目录为 `latex/<slug>/main.tex`，构建命令见 README。第 0.5 节提到的 Tectonic + Pandoc 原型已经移除，保留这一节是为了记录当时的取舍。
 >
 > 结论先行：**可行，而且不需要"转换器"**。把 `.tex` 当唯一源文件，在 CI 里用真正的 TeX 引擎编译成 HTML（或 PDF），网站只负责外壳。

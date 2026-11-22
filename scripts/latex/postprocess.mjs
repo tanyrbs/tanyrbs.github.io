@@ -32,6 +32,7 @@ const MACROS = {
 
 const stats = { notes: 0, math: 0, mathFail: 0, headings: 0, images: 0 }
 const failures = []
+const problems = []
 
 const listDirs = (dir) =>
   fs.existsSync(dir)
@@ -143,44 +144,59 @@ function renderTex(tex, displayMode) {
   }
 }
 
+// 行间公式在 tex4ht 里可能被包成 <div> 也可能被包成 <span>（取决于 TeX Live 版本
+// 和公式出现的上下文），属性引号也可能是单引号或双引号，这里都用正则匹配。
+const INLINE_OPEN = /<span\b[^>]*\bclass=["']?mathjax-inline\b[^>]*>/i
+const BLOCK_OPEN = /<(span|div)\b[^>]*\bclass=["']?mathjax-block\b[^>]*>/i
+// 环境型公式（align / equation 等）又是另一种包裹：class='mathjax-env mathjax-align*'
+const ENV_OPEN = /<(span|div)\b[^>]*\bclass=["']?mathjax-env\b[^>]*>/i
+
 // tex4ht 偶尔会漏写公式 span 的闭合标签，导致下一段公式被吞进来。
 // 遇到"两个开标签之间没有闭标签"就补一个 </span>。
-function balanceMathSpans(html, openTag, closeTag) {
+function balanceOpeners(html, openerRe, closeTag) {
   let out = ""
   let i = 0
   let pending = false
   while (true) {
-    const idx = html.indexOf(openTag, i)
-    if (idx < 0) {
+    const re = new RegExp(openerRe.source, "gi")
+    re.lastIndex = i
+    const m = re.exec(html)
+    if (!m) {
       out += html.slice(i)
       break
     }
-    const segment = html.slice(i, idx)
+    const segment = html.slice(i, m.index)
     out += segment
     if (pending && !segment.includes(closeTag)) out += closeTag
-    out += openTag
+    out += m[0]
     pending = true
-    i = idx + openTag.length
+    i = m.index + m[0].length
   }
   return out
 }
 
-// 按 <span>/<div> 的配对深度找出成对区域，避免 tex4ht 偶发漏闭合标签时把两段公式吞成一段
-function replacePaired(html, openTag, tagName, render) {
-  const closeTag = "</" + tagName + ">"
+// 按标签配对深度取出成对区域。开标签用正则描述，兼容 <span>/<div> 与单双引号：
+// 不同版本的 tex4ht 对行间公式的包裹标签并不一致（本地是 <div>，CI 容器里是 <span>），
+// 只认一种写法就会把另一种原样留在页面上，用户看到的就是一坨 \( ... \) 源码。
+function replacePaired(html, openerRe, render) {
   let out = ""
   let i = 0
   while (i < html.length) {
-    const start = html.indexOf(openTag, i)
-    if (start < 0) {
+    const re = new RegExp(openerRe.source, "gi")
+    re.lastIndex = i
+    const m = re.exec(html)
+    if (!m) {
       out += html.slice(i)
       break
     }
-    out += html.slice(i, start)
+    out += html.slice(i, m.index)
+    const tag = m[1] || "span"
+    const closeTag = "</" + tag + ">"
+    const bodyStart = m.index + m[0].length
     let depth = 1
-    let j = start + openTag.length
+    let j = bodyStart
     while (depth > 0) {
-      const nextOpen = html.indexOf("<" + tagName, j)
+      const nextOpen = html.indexOf("<" + tag, j)
       const nextClose = html.indexOf(closeTag, j)
       if (nextClose < 0) {
         j = html.length
@@ -188,13 +204,13 @@ function replacePaired(html, openTag, tagName, render) {
       }
       if (nextOpen >= 0 && nextOpen < nextClose) {
         depth += 1
-        j = nextOpen + tagName.length + 1
+        j = nextOpen + tag.length + 1
       } else {
         depth -= 1
         j = nextClose + closeTag.length
       }
     }
-    const inner = html.slice(start + openTag.length, j - closeTag.length)
+    const inner = html.slice(bodyStart, Math.max(bodyStart, j - closeTag.length))
     out += render(inner)
     i = j
   }
@@ -202,9 +218,8 @@ function replacePaired(html, openTag, tagName, render) {
 }
 
 function renderMath(html) {
-  html = balanceMathSpans(html, "<span class='mathjax-inline'>", "</span>")
-  html = balanceMathSpans(html, "<div class='mathjax-block'>", "</div>")
-  html = replacePaired(html, "<span class='mathjax-inline'>", "span", (inner) => {
+  html = balanceOpeners(html, INLINE_OPEN, "</span>")
+  html = replacePaired(html, INLINE_OPEN, (inner) => {
     let text = decodeTex(inner).replace(/^\s*\\\(/, "")
     let rest = ""
     // tex4ht 偶尔会把后续正文写进公式 span 里，遇到第一个 \) 就把剩下部分踢出去
@@ -215,11 +230,11 @@ function renderMath(html) {
     }
     return '<span class="katex-math">' + renderTex(text, false) + "</span>" + rest
   })
-  html = replacePaired(html, "<div class='mathjax-block'>", "div", (inner) => {
+  html = replacePaired(html, BLOCK_OPEN, (inner) => {
     const tex = decodeTex(inner).replace(/^\s*\\\[/, "").replace(/\\\]\s*$/, "")
     return '<div class="katex-display">' + renderTex(tex, true) + "</div>"
   })
-  html = html.replace(/<div class='mathjax-env[^']*'>([\s\S]*?)<\/div>/g, (_m, inner) => {
+  html = replacePaired(html, ENV_OPEN, (inner) => {
     return '<div class="katex-display">' + renderTex(decodeTex(inner), true) + "</div>"
   })
   return html
@@ -329,6 +344,7 @@ function writeNote(slug, dir) {
   }
   const meta = parseMeta(fs.readFileSync(texPath, "utf8"))
   const html = transform(fs.readFileSync(rawPath, "utf8"), slug, dir)
+  verifyClean(slug, html)
   const toc = buildToc(html)
 
   const assetDir = path.join(ROOT, "assets", "notes", slug)
@@ -386,6 +402,15 @@ function cleanGenerated(slugs) {
   }
 }
 
+// 兜底校验：转换完的正文里不该再出现 tex4ht 的公式包裹标签，也不该出现原始 TeX 定界符。
+// 出现说明某种新写法没被覆盖 —— 宁可构建失败，也不要把一页公式源码发布出去。
+function verifyClean(slug, body) {
+  const leftover = body.match(/class=['"]?mathjax-(?:inline|block|env)/i)
+  const rawDelim = body.match(/\\[\[(]/)
+  if (leftover) problems.push(slug + "：残留 " + leftover[0] + "（公式没有被 KaTeX 处理）")
+  else if (rawDelim) problems.push(slug + "：正文里还有原始 TeX 定界符 " + rawDelim[0])
+}
+
 function main() {
   if (listDirs(LATEX_OUT).length === 0) {
     console.error("[latex] latex-out 是空的，请先运行 scripts/latex/compile.mjs")
@@ -401,6 +426,11 @@ function main() {
   if (failures.length) {
     console.warn("[latex] 公式渲染失败样例：")
     for (const f of failures.slice(0, 10)) console.warn("  - " + f)
+  }
+  if (problems.length) {
+    console.error("[latex] 有页面没转换干净，构建中止：")
+    for (const item of problems) console.error("  - " + item)
+    process.exit(1)
   }
 }
 

@@ -79,6 +79,20 @@ public/  →  pagefind  →  GitHub Pages
 选型调研、make4ht 的两个坑，以及 PDF / lwarp / LaTeXML 等路线的实测对比见
 [`docs/latex-native-publishing.md`](docs/latex-native-publishing.md)。
 
+## 已知坑
+
+**tex4ht 的版本差异会改变公式包裹标签。** 同一份 `.tex`，本地 TeX Live 2025 把行间公式包成
+`<div class='mathjax-block'>`，CI 容器里的 make4ht 却包成 `<span class='mathjax-block'>`；
+环境型公式（align / equation）又是 `<span class='mathjax-env mathjax-align*'>`，属性引号还可能被省略。
+`postprocess.mjs` 这三种都匹配，写新的清洗规则时别只认一种写法。
+
+**转换完会自检。** 产物里如果还残留 `mathjax-*` 包裹或原始 `\(` / `\[`，`npm run notes` 直接以退出码 1
+中止构建，不会再把裸公式发布出去。（线上公式"乱码"就是漏了这一层：脚本只认 `<div>`，CI 给的是 `<span>`，
+于是整页公式原样输出成 TeX 源码。）
+
+**中文必须走 LuaLaTeX。** `make4ht -x`（XeLaTeX）和 pdfLaTeX 都会静默丢掉中文正文，
+`compile.mjs` 会统计产物里的汉字数量，不过关就报错。
+
 ## GitHub Pages
 
 `.github/workflows/pages.yml` 分两个 job：
