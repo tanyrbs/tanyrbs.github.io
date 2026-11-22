@@ -734,23 +734,22 @@ button:focus-visible {
     position: sticky;
     z-index: 5;
     top: 0;
-    display: flex;
-    min-height: 58px;
-    justify-content: space-between;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
     align-items: center;
-    padding: 8px 16px;
+    gap: 8px;
+    padding: 10px 12px 12px;
     color: #fff;
     background: var(--brand);
+    text-align: center;
   }
 
   .mobile-brand {
+    display: flex;
     min-width: 0;
+    flex-direction: column;
+    gap: 3px;
     color: #fff;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 19px;
-    font-weight: 700;
-    overflow-wrap: anywhere;
   }
 
   .mobile-brand:hover {
@@ -758,12 +757,50 @@ button:focus-visible {
     text-decoration: none;
   }
 
+  .mobile-brand-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .mobile-brand-tagline {
+    color: #c6c8cc;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
   .nav-toggle {
-    flex: none;
-    min-height: 36px;
-    border-color: #45464a;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .nav-toggle .icon-bar {
+    display: block;
+    width: 20px;
+    height: 2px;
+    border-radius: 1px;
+    background: #fff;
+  }
+
+  .mobile-search {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
     color: #fff;
-    background: #242528;
+    justify-self: end;
   }
 
   .site-layout {

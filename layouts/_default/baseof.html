@@ -3,10 +3,21 @@
   {{ partial "head.html" . }}
   <body>
     <header class="mobile-header">
-      <a class="mobile-brand" href="{{ site.Home.RelPermalink }}">{{ site.Title }}</a>
-      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-sidebar">
-        {{ i18n "menu" }}
+      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-sidebar" aria-label="{{ i18n "menu" }}">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
       </button>
+      <a class="mobile-brand" href="{{ site.Home.RelPermalink }}">
+        <span class="mobile-brand-title">{{ site.Title }}</span>
+        {{ with site.Params.tagline }}<span class="mobile-brand-tagline">{{ . }}</span>{{ end }}
+      </a>
+      <a class="mobile-search" href="{{ "search/" | relURL }}" aria-label="{{ i18n "search" }}">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/>
+          <line x1="15.5" y1="15.5" x2="20.5" y2="20.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </a>
     </header>
     <div class="site-layout">
       <aside class="site-sidebar" id="site-sidebar">
