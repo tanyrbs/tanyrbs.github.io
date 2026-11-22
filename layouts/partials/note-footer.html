@@ -1,9 +1,0 @@
-{{ $repo := site.Params.repoURL | default site.Params.github }}
-<div class="note-footer" data-pagefind-ignore>
-  <span>{{ i18n "noteLicense" }}</span>
-  {{ with .Params.latexSource }}
-    <a href="{{ $repo }}/edit/main/{{ . }}" target="_blank" rel="noopener">{{ i18n "noteErrata" }}</a>
-    <a href="{{ $repo }}/blob/main/{{ . }}" target="_blank" rel="noopener">{{ i18n "latexSource" }}</a>
-  {{ end }}
-  <span>{{ i18n "noteUpdated" }} {{ .Lastmod.Format "2006-01-02" }}</span>
-</div>

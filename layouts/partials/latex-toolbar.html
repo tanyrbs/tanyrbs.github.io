@@ -1,9 +1,0 @@
-{{ $source := .Params.latexSource }}
-<div class="latex-toolbar" data-pagefind-ignore>
-  <span class="latex-badge">LaTeX</span>
-  {{ with .Params.lectureSeries }}<span class="latex-toolbar-series">{{ . }}</span>{{ end }}
-  {{ with $source }}
-    {{ $repo := site.Params.repoURL | default site.Params.github }}
-    <a href="{{ $repo }}/blob/main/{{ . }}" target="_blank" rel="noopener">{{ i18n "latexSource" }}</a>
-  {{ end }}
-</div>

@@ -1,26 +1,8 @@
 [home]
 other = "首页"
 
-[blog]
-other = "博客"
-
 [about]
 other = "关于"
-
-[search]
-other = "搜索"
-
-[github]
-other = "GitHub"
-
-[email]
-other = "邮箱"
-
-[school]
-other = "学校"
-
-[recentPosts]
-other = "最新文章"
 
 [allPosts]
 other = "全部文章"
@@ -37,23 +19,11 @@ other = "分类"
 [archives]
 other = "文章索引"
 
-[browseCategories]
-other = "按分类浏览"
-
 [browseByYear]
 other = "按年份浏览"
 
 [postCount]
 other = "{{ .Count }} 篇文章"
-
-[categoryCount]
-other = "{{ .Count }} 个分类"
-
-[viewAllCategories]
-other = "查看全部分类"
-
-[backToCategories]
-other = "返回分类总览"
 
 [uncategorized]
 other = "未分类"
@@ -76,14 +46,8 @@ other = "评论"
 [searchPlaceholder]
 other = "搜索文章和页面"
 
-[language]
-other = "语言"
-
 [rss]
 other = "RSS"
-
-[archive]
-other = "归档"
 
 [latestPosts]
 other = "最新发布"
@@ -96,7 +60,6 @@ other = "阅读全文"
 
 [menu]
 other = "菜单"
-
 
 [siteInformation]
 other = "站点信息"
@@ -116,57 +79,7 @@ other = "较新文章"
 [olderPost]
 other = "较早文章"
 
-[lectureTemplateCredit]
-other = "讲义版式改编自"
-
-[notes]
-other = "笔记"
-
-[noteCount]
-other = "{{ .Count }} 篇笔记"
-
-[latexSource]
-other = "LaTeX 源码"
-
-[openPdf]
-other = "打开 PDF"
-
-[downloadPdf]
-other = "下载 PDF"
-
-[pdfPreviewUnavailable]
-other = "如果内嵌预览不可用，请"
-
-[pdfMissing]
-other = "PDF 尚未生成。"
-
-[plainTextVersion]
-other = "文字版（便于检索与复制）"
-
-[pdfLoading]
-other = "正在加载 PDF…"
-
-[pdfLoadError]
-other = "PDF 预览加载失败，请使用上方的“打开 PDF”。"
-
-[noteSeries]
-other = "系列"
-
-[relatedNotes]
-other = "相关笔记"
-
-[noteLicense]
-other = "本文用 CC BY-NC-SA 4.0 授权，转载注明出处。"
-
-[noteErrata]
-other = "发现错误？提 PR"
-
-[noteUpdated]
-other = "最后更新于"
-
 [noteBuildMissing]
 other = "这篇笔记的正文还没生成，运行 npm run notes 后重试。"
-[homeIntro]
-other = "这里记录数学、强化学习与大模型基础设施方面的学习笔记。笔记直接用 LaTeX 写，构建时编译成网页；短文仍用 Markdown。"
 [articles]
 other = "文章"

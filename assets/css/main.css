@@ -204,34 +204,9 @@ button:focus-visible {
   overflow-wrap: anywhere;
 }
 
-.sidebar-controls {
-  display: grid;
-  gap: 8px;
-  margin-top: 12px;
-}
 
-.language-switcher {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px;
-}
 
-.language-switcher a,
-.nav-toggle {
-  min-height: 38px;
-  padding: 6px 12px;
-  border: 1px solid var(--line);
-  border-radius: 2px;
-  color: var(--text);
-  background: var(--surface);
-  cursor: pointer;
-}
 
-.language-switcher a[aria-current="page"] {
-  border-color: var(--accent);
-  color: var(--accent);
-}
 
 .nav-toggle:hover {
   border-color: var(--accent);
@@ -607,22 +582,8 @@ button:focus-visible {
   box-shadow: none;
 }
 
-.catalog-actions,
-.year-nav {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 16px;
-}
 
-.catalog-stats {
-  font-size: 14px;
-}
 
-.catalog-actions {
-  margin-top: 12px;
-  font-size: 14px;
-}
 
 .year-nav {
   color: var(--muted);
@@ -908,48 +869,6 @@ button:focus-visible {
   }
 }
 /* 首页：一句话简介 + 联系方式 */
-.home-heading {
-  margin-bottom: 1.4em;
-}
-.home-affiliation {
-  color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.7;
-}
-.home-intro {
-  font-size: 1.02rem;
-  line-height: 1.95;
-  max-width: 46rem;
-}
-.home-intro p {
-  margin: 0 0 1.2em;
-}
-.home-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5em 1.6em;
-  margin-bottom: 1.6em;
-}
-.home-links a {
-  color: var(--accent);
-  text-decoration: none;
-}
-.home-links a:hover {
-  text-decoration: underline;
-}
-.home-sections {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4em 1.2em;
-  font-size: 0.95rem;
-}
-.home-sections a {
-  color: var(--muted);
-  text-decoration: underline;
-}
-.home-sections a:hover {
-  color: var(--accent);
-}
 /* 学校分两行显示 */
 .brand-description span,
 .profile-affiliation span {
@@ -994,70 +913,11 @@ button:focus-visible {
   color: var(--muted);
 }
 /* 首页搜索 */
-.home-search {
-  padding: 20px 24px 24px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 2px;
-  box-shadow: var(--shadow);
-  margin-bottom: 16px;
-}
-.home-search pagefind-input,
-.home-search pagefind-results {
-  --pagefind-ui-font: inherit;
-}
-.home-search pagefind-summary,
-.home-search pagefind-results {
-  display: block;
-  margin-top: 12px;
-}
 
 /* 合并页：笔记 + 短文 */
-.articles-block {
-  margin-bottom: 28px;
-}
-.articles-heading {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin: 0 0 14px;
-  font-size: 20px;
-  font-weight: 400;
-}
 .articles-count {
   color: var(--muted);
   font-size: 14px;
-}
-.articles-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.articles-list li {
-  padding: 14px 0;
-  border-top: 1px solid var(--line);
-}
-.articles-list li:first-child {
-  border-top: 0;
-}
-.articles-list a {
-  color: var(--text);
-  font-size: 17px;
-  text-decoration: none;
-}
-.articles-list a:hover {
-  color: var(--accent);
-}
-.articles-list time {
-  margin-left: 10px;
-  color: var(--muted);
-  font-size: 13px;
-}
-.articles-list p {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.7;
 }
 .notes-series h3 {
   font-size: 1.05rem;

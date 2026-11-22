@@ -92,39 +92,8 @@
 }
 
 /* 顶部工具条：标识这是一篇 LaTeX 笔记 */
-.latex-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5em 1em;
-  margin: 0 0 1.4em;
-  font-size: 0.86rem;
-  color: var(--muted);
-}
-.latex-badge {
-  padding: 0.1em 0.55em;
-  border-radius: 4px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-.latex-toolbar a { color: var(--muted); text-decoration: underline; }
-.latex-toolbar a:hover { color: var(--accent); }
 
 /* 系列导航 */
-.note-series {
-  margin: 0 0 1.6em;
-  padding: 0.9em 1.1em;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface-soft);
-  font-size: 0.9rem;
-}
-.note-series-title { margin: 0 0 0.5em; font-weight: 700; }
-.note-series ol { margin: 0; padding-left: 1.2em; }
-.note-series li { margin: 0.25em 0; }
-.note-series li[aria-current] { font-weight: 700; color: var(--accent); }
 
 /* 目录 */
 .note-toc-list {
@@ -136,24 +105,8 @@
 .note-toc-list ul { padding-left: 1em; }
 
 /* 页脚：许可 / 勘误 / 更新 */
-.note-footer {
-  margin: 2.6em 0 0;
-  padding-top: 1.2em;
-  border-top: 1px solid var(--line);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6em 1.4em;
-  align-items: baseline;
-  font-size: 0.86rem;
-  color: var(--muted);
-}
-.note-footer a { color: inherit; text-decoration: underline; }
-.note-footer a:hover { color: var(--accent); }
 
 /* 相关笔记 */
-.related-notes { margin: 2em 0 0; }
-.related-notes h2 { font-size: 1.05rem; margin: 0 0 0.6em; }
-.related-notes ul { margin: 0; padding-left: 1.2em; line-height: 1.8; }
 
 /* 笔记列表：按系列分组 */
 /* tex4ht 的 \begin{center} 与插图 */
