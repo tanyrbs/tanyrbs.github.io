@@ -1,23 +1,45 @@
-# tanyrbs.github.io
+# blog的碎碎念
 
-个人站点：<https://tanyrbs.github.io/>。Hugo 打外壳，内容有两条来源——手写 Markdown 短文，和直接用 LaTeX 写的笔记（构建时编译成网页）。
-两种内容在页面上是**同一套模板**，都汇到 [/articles/](https://tanyrbs.github.io/articles/) 按系列分组。
+<https://tanyrbs.github.io/> — THT 的个人博客。内容有两条来源：手写 Markdown 短文，和直接用
+LaTeX 写的笔记（构建时编译成网页）。两者在页面上是**同一套模板**，都汇到
+[/articles/](https://tanyrbs.github.io/articles/) 按系列分组。
+
+## 页面结构
+
+| 页面 | 内容 |
+|---|---|
+| 首页 `/` | 最新 8 篇文章卡片 + 右侧栏（最新发布 / 分类 / 标签） |
+| 文章 `/articles/` | 按 `lectureSeries` 分系列框，笔记与短文混排 |
+| 文章页 | 标题横幅 + 正文；侧栏是「目录 / 关于」两个标签页，目录带阅读进度条 |
+| 文章索引 `/archives/` | 按年份归档 |
+| 分类 `/categories/` | 系列一目了然的卡片列表 |
+| 标签 `/tags/` | 标签云 |
+| 搜索 `/search/?q=关键词` | Pagefind 全文搜索，侧栏搜索框提交到这里 |
+| 关于 `/about/` | 个人页（导航里没有入口，可从侧栏关于卡片进） |
+
+`/blog/` 和 `/notes/` 是两条内容来源各自的列表页，导航里不再露出，但链接可访问。
+
+窄屏（≤960px，或浏览器放大到该宽度）自动切到单栏：顶部是「☰ + 站点名 + 搜索」的黑色工具栏，
+左侧栏收进抽屉。
 
 ## 目录结构
 
 ```
-archetypes/          hugo new 用的文章骨架（blog.md）
-assets/css/          main.css（站点骨架）、lecture.css（文章模板）、latex-note.css（LaTeX 正文）
-assets/js/site.js    只有移动端侧栏开关
+archetypes/            hugo new 用的文章骨架（blog.md）
+assets/css/            main.css（站点骨架）、lecture.css（文章模板）、latex-note.css（LaTeX 正文）
+assets/js/site.js      侧栏抽屉、目录/关于标签切换、阅读进度
 content/
-  blog/              Markdown 短文（每条一个 .md）
-  notes/             每条一个目录，index.md 由脚本生成，不要手改
-  articles.md        合并列表页，layout 指到 layouts/_default/articles.html
-latex/<slug>/        LaTeX 笔记源文件：main.tex + preamble.tex + figures/
-layouts/             模板；_default/single.html 同时处理 Markdown 与 LaTeX 两种正文
-scripts/latex/       compile.mjs（TeX → HTML）、postprocess.mjs（清洗 + KaTeX + frontmatter）
-scripts/hugo.mjs     跨平台调用 Hugo
-docs/                历史调研（Quartz 分析、LaTeX 发布方案），不参与构建
+  blog/                Markdown 短文（每条一个 .md）
+  notes/               每条一个目录，index.md 由脚本生成，不要手改
+  articles.md          合并列表页，layout 指到 layouts/_default/articles.html
+latex/<slug>/          LaTeX 笔记源文件：main.tex + preamble.tex + figures/
+layouts/
+  _default/            single（正文）、list、articles、archives、terms、search、rss、404
+  partials/            baseof 用到的：nav、profile、sidebar-tabs、article-toc、right-rail…
+  shortcodes/          lecture-box（四种彩色盒子）
+scripts/latex/         compile.mjs（TeX → HTML）、postprocess.mjs（清洗 + KaTeX + frontmatter）
+scripts/hugo.mjs       跨平台调用 Hugo
+docs/                  历史调研（Quartz 分析、LaTeX 发布方案），不参与构建
 ```
 
 ## 常用命令
@@ -36,6 +58,18 @@ npm run publish            # 上面三步一起
 
 Windows 上 Hugo 不在 PATH 时 `scripts/hugo.mjs` 会自动去 `../tools/hugo/hugo.exe` 找；
 也可以设环境变量 `HUGO`。
+
+## 站点设置（hugo.toml）
+
+| 键 | 作用 |
+|---|---|
+| `title` | 站点名，侧栏顶部、顶栏、浏览器标签页、RSS 都用它 |
+| `params.author` | 作者名（关于卡片） |
+| `params.tagline` | 侧栏与顶栏那一行标语 |
+| `params.affiliation` / `affiliationSecondary` | 关于卡片里显示的两行学校/机构 |
+| `params.email` / `github` / `wechat` | 关于卡片的三个图标链接 |
+| `params.avatar` | 头像，放 `static/img/` |
+| `params.seriesOrder` | `/articles/` 里系列框的显示顺序，未列出的按名字排在最后 |
 
 ## 内容模型
 
@@ -71,11 +105,9 @@ LaTeX 笔记写在 `main.tex` 开头的 `%!` 注释里：
 %! description: 一句话摘要，用于列表与搜索。
 ```
 
-没有系列的文章会进「未分类」框，不会消失。系列框的显示顺序由 `hugo.toml` 的
-`params.seriesOrder` 决定，没列出的按名字排在最后。
-
-**新增一个系列**只需要给内容填上新的 `lectureSeries`，推上去自动生成系列框、
-`/categories/<系列>/` 分类页、`/tags/<标签>/` 标签页——不需要注册任何东西。
+没有系列的文章会进「未分类」框，不会消失。**新增一个系列**只要给内容填上新的
+`lectureSeries`，推上去自动生成系列框、`/categories/<系列>/` 分类页、`/tags/<标签>/`
+标签页——不需要注册任何东西。
 
 ## 写一篇 Markdown 短文
 

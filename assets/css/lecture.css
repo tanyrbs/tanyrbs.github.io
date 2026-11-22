@@ -46,10 +46,6 @@
   line-height: 1.65;
 }
 
-.lecture-banner .article-meta {
-  font-size: 13px;
-}
-
 .lecture-toc {
   padding: 12px 18px;
   background: #fff;
@@ -163,14 +159,6 @@
 .lecture-content .math-block {
   margin: 1.25em 0;
   padding: 0.4em 0;
-}
-
-.lecture-template-credit {
-  margin: 30px 0 0;
-  padding-top: 16px;
-  border-top: 1px solid #dce4f3;
-  color: var(--muted);
-  font-size: 12px;
 }
 
 @media (max-width: 680px) {

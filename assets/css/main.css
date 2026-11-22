@@ -213,13 +213,6 @@ button:focus-visible {
   font-size: 13px;
 }
 
-.profile-links {
-  display: grid;
-  gap: 5px;
-  font-size: 12px;
-  overflow-wrap: anywhere;
-}
-
 
 
 
