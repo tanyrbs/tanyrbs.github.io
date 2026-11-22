@@ -12,12 +12,12 @@ locale = "zh-CN"
 [params]
   # /articles/ 里系列框的显示顺序；没列出的系列按名字排在后面
   seriesOrder = ["强化学习", "verl 框架解析", "LLM基础架构"]
-  description = "THT，香港中文大学（深圳），华东理工大学"
+  description = "THT，cuhk_sz，ecust"
   author = "THT"
   tagline = "记录学习与生活的一些个人浅显理解"
   wechat = "https://mp.weixin.qq.com/s/78rQbWsfAbwjaXzEyuk7dw"
-  affiliation = "香港中文大学（深圳）"
-  affiliationSecondary = "华东理工大学"
+  affiliation = "cuhk_sz"
+  affiliationSecondary = "ecust"
   email = "226010319@link.cuhk.edu.cn"
   github = "https://github.com/tanyrbs"
   avatar = "/img/avatar.JPG"
