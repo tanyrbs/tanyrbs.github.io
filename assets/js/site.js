@@ -7,7 +7,7 @@ if (navToggle && sidebar) {
     navToggle.setAttribute("aria-expanded", String(isOpen));
   });
 
-  window.matchMedia("(min-width: 761px)").addEventListener("change", () => {
+  window.matchMedia("(min-width: 961px)").addEventListener("change", () => {
     sidebar.classList.remove("is-open");
     navToggle.setAttribute("aria-expanded", "false");
   });
