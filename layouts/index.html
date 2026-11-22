@@ -1,6 +1,6 @@
 {{ define "main" }}
   {{ $posts := where site.RegularPages "Section" "in" (slice "blog" "notes") }}
-  <section class="post-list" aria-label="{{ i18n "recentPosts" }}">
+  <section class="post-list" aria-label="{{ i18n "articles" }}">
     {{ range first 8 ($posts.ByDate.Reverse) }}
       <article class="post-card">
         <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
