@@ -1,7 +1,7 @@
 baseURL = "https://tanyrbs.github.io/"
 enableGitInfo = true
 titleCaseStyle = "none"
-title = "blog的碎碎念"
+title = "Converging"
 copyright = "(c) 2026 THT"
 enableRobotsTXT = true
 timeZone = "Asia/Shanghai"

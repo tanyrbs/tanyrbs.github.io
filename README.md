@@ -1,4 +1,4 @@
-# blog的碎碎念
+# Converging
 
 <https://tanyrbs.github.io/> — THT 的个人博客。内容有两条来源：手写 Markdown 短文，和直接用
 LaTeX 写的笔记（构建时编译成网页）。两者在页面上是**同一套模板**，都汇到
