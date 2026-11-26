@@ -1,21 +1,21 @@
 :root {
   color-scheme: light;
-  --bg: #f7f9fc;
-  --surface: #ffffff;
-  --surface-soft: #f1f5fb;
-  --text: #1e293b;
-  --muted: #64748b;
-  --line: #e5eaf3;
-  --accent: #4f46e5;
-  --accent-soft: #eef2ff;
-  --accent-border: #c7d2fe;
+  --bg: #eae8e3;
+  --surface: #faf9f7;
+  --surface-soft: #f0eee9;
+  --text: #272b30;
+  --muted: #666c75;
+  --line: #dcd8d0;
+  --accent: #2c5d72;
+  --accent-soft: #eaf0f3;
+  --accent-border: #c5d6de;
   --series-color: var(--accent);
   --series-soft: var(--accent-soft);
   --series-border: var(--accent-border);
-  --brand: #1e1b4b;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 2px 10px rgba(79, 70, 229, 0.045);
+  --brand: #1e232a;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --shadow: 0 1px 4px rgba(30, 35, 42, 0.07);
 }
 
 * {
@@ -105,17 +105,16 @@ button:focus-visible {
   justify-content: center;
   gap: 6px;
   padding: 18px 16px;
-  color: var(--brand);
-  background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 58%, #fdf2f8 100%);
-  border: 1px solid #e0e7ff;
+  color: #f3f1ed;
+  background: var(--brand);
+  border: 0;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   text-align: center;
 }
 
 .brand:hover {
-  color: var(--brand);
-  border-color: var(--series-border);
+  color: #ffffff;
   text-decoration: none;
 }
 
@@ -128,7 +127,7 @@ button:focus-visible {
 }
 
 .brand-description {
-  color: #5b6478;
+  color: #b8bcc4;
   font-size: 13px;
   line-height: 1.55;
   text-wrap: balance;
@@ -278,7 +277,7 @@ button:focus-visible {
 }
 
 .post-card:hover {
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.08);
+  box-shadow: 0 4px 12px rgba(30, 35, 42, 0.08);
   transform: translateY(-1px);
 }
 
@@ -828,10 +827,9 @@ button:focus-visible {
     align-items: center;
     gap: 8px;
     padding: 10px 12px 12px;
-    color: var(--brand);
-    background: rgba(247, 249, 252, 0.94);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--line);
+    color: #f3f1ed;
+    background: var(--brand);
+    border-bottom: 0;
     text-align: center;
   }
 
@@ -840,11 +838,11 @@ button:focus-visible {
     min-width: 0;
     flex-direction: column;
     gap: 3px;
-    color: var(--brand);
+    color: #f3f1ed;
   }
 
   .mobile-brand:hover {
-    color: var(--brand);
+    color: #ffffff;
     text-decoration: none;
   }
 
@@ -856,7 +854,7 @@ button:focus-visible {
   }
 
   .mobile-brand-tagline {
-    color: var(--muted);
+    color: #b8bcc4;
     font-size: 12px;
     line-height: 1.45;
   }
@@ -881,7 +879,7 @@ button:focus-visible {
     width: 20px;
     height: 2px;
     border-radius: 1px;
-    background: #334155;
+    background: #f3f1ed;
   }
 
   .mobile-search {
@@ -890,7 +888,7 @@ button:focus-visible {
     height: 40px;
     align-items: center;
     justify-content: center;
-    color: var(--brand);
+    color: #f3f1ed;
     justify-self: end;
   }
 
@@ -1191,7 +1189,7 @@ button:focus-visible {
   height: 6px;
   overflow: hidden;
   border-radius: 999px;
-  background: var(--series-soft);
+  background: #e2dfd9;
 }
 .reading-progress-bar {
   position: absolute;
@@ -1325,7 +1323,7 @@ button:focus-visible {
 /* 首页：导语与系列色卡片栏 */
 .home-intro {
   padding: 16px 22px;
-  background: linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -1368,7 +1366,7 @@ button:focus-visible {
   transform: translateY(-1px);
   border-color: var(--series-border);
   border-top-color: var(--series-color);
-  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.08);
+  box-shadow: 0 4px 12px rgba(30, 35, 42, 0.08);
   text-decoration: none;
 }
 
