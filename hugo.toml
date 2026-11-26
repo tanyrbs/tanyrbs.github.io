@@ -12,6 +12,7 @@ locale = "zh-CN"
 [params]
   # /articles/ 里系列框的显示顺序；没列出的系列按名字排在后面
   seriesOrder = ["强化学习", "verl 框架解析", "LLM基础架构"]
+  homeIntro = "记录强化学习、分布式训练框架与大模型基础架构的推导与思考。"
   description = "THT，cuhk_sz，ecust"
   author = "THT"
   tagline = "still converging, writing it down"
@@ -25,6 +26,24 @@ locale = "zh-CN"
   dateFormat = "2006-01-02"
   showReadingTime = true
   showToc = true
+
+  [[params.seriesColors]]
+    name = "强化学习"
+    color = "#4f46e5"
+    soft = "#eef2ff"
+    border = "#c7d2fe"
+
+  [[params.seriesColors]]
+    name = "verl 框架解析"
+    color = "#0d9488"
+    soft = "#f0fdfa"
+    border = "#99f6e4"
+
+  [[params.seriesColors]]
+    name = "LLM基础架构"
+    color = "#7c3aed"
+    soft = "#f5f3ff"
+    border = "#ddd6fe"
 
   [params.giscus]
     enabled = false

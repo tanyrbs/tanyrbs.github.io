@@ -61,9 +61,28 @@
   </article>
 
   {{ if or (eq .Section "blog") $isNote }}
-    <nav class="article-pagination" aria-label="{{ i18n "articleNavigation" }}">
-      {{ with .PrevInSection }}<a href="{{ .RelPermalink }}"><span>{{ i18n "newerPost" }}</span>{{ .LinkTitle }}</a>{{ end }}
-      {{ with .NextInSection }}<a href="{{ .RelPermalink }}"><span>{{ i18n "olderPost" }}</span>{{ .LinkTitle }}</a>{{ end }}
-    </nav>
+    {{ $prev := .PrevInSection }}
+    {{ $next := .NextInSection }}
+    {{ $prevLabel := i18n "newerPost" }}
+    {{ $nextLabel := i18n "olderPost" }}
+    {{ with .Params.lectureSeries }}
+      {{ $same := sort (where (where site.RegularPages "Section" "in" (slice "blog" "notes")) "Params.lectureSeries" .) "Params.lectureNumber" }}
+      {{ $idx := -1 }}
+      {{ range $i, $item := $same }}
+        {{ if eq $item.RelPermalink $.RelPermalink }}{{ $idx = $i }}{{ end }}
+      {{ end }}
+      {{ if ge $idx 0 }}
+        {{ $prev = cond (gt $idx 0) (index $same (sub $idx 1)) nil }}
+        {{ $next = cond (lt (add $idx 1) (len $same)) (index $same (add $idx 1)) nil }}
+        {{ $prevLabel = "上一讲" }}
+        {{ $nextLabel = "下一讲" }}
+      {{ end }}
+    {{ end }}
+    {{ if or $prev $next }}
+      <nav class="article-pagination" aria-label="{{ i18n "articleNavigation" }}">
+        {{ with $prev }}<a href="{{ .RelPermalink }}"><span>{{ $prevLabel }}</span>{{ .LinkTitle }}</a>{{ end }}
+        {{ with $next }}<a href="{{ .RelPermalink }}"><span>{{ $nextLabel }}</span>{{ .LinkTitle }}</a>{{ end }}
+      </nav>
+    {{ end }}
   {{ end }}
 {{ end }}

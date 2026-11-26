@@ -19,7 +19,16 @@
         </svg>
       </a>
     </header>
-    <div class="site-layout">
+    {{- $pageSeries := .Params.lectureSeries | default "" -}}
+    {{- if and (not $pageSeries) .IsPage -}}
+      {{- with (.GetTerms "categories") -}}
+        {{- $pageSeries = (index . 0).LinkTitle -}}
+      {{- end -}}
+    {{- else if and (not $pageSeries) (eq .Kind "term") (eq .Data.Plural "categories") -}}
+      {{- $pageSeries = .Title -}}
+    {{- end -}}
+    {{- $pagePal := partial "series-palette.html" $pageSeries -}}
+    <div class="site-layout" {{ $pagePal.styleAttr }}>
       {{ $isArticle := and (eq .Kind "page") (in (slice "blog" "notes") .Section) }}
       <aside class="site-sidebar{{ if $isArticle }} has-tabs{{ end }}" id="site-sidebar">
         <div class="sidebar-content">

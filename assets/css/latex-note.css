@@ -20,7 +20,7 @@
 .latex-note h3 { font-size: 1.22rem; }
 .latex-note h4 { font-size: 1.06rem; }
 .latex-note .titlemark {
-  color: var(--accent);
+  color: var(--series-color, var(--accent));
   margin-right: 0.45em;
   font-variant-numeric: tabular-nums;
 }
@@ -174,23 +174,23 @@
   margin: 0 0 1em;
 }
 .latex-note h2 {
-  margin: 36px 0 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #dce4f3;
-  color: #1f3c88;
-  font-size: 25px;
-  line-height: 1.5;
+  margin: 34px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  color: #1e293b;
+  font-size: 24px;
+  line-height: 1.45;
 }
 .latex-note h3 {
-  margin: 26px 0 12px;
-  color: #2f54eb;
-  font-size: 21px;
+  margin: 24px 0 10px;
+  color: #334155;
+  font-size: 20px;
   line-height: 1.5;
 }
 .latex-note h4 {
-  margin: 22px 0 10px;
-  color: #1f3c88;
-  font-size: 18px;
+  margin: 20px 0 8px;
+  color: #334155;
+  font-size: 17.5px;
   line-height: 1.45;
 }
 .latex-note ul,

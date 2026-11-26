@@ -1,0 +1,26 @@
+{{- $name := string (. | default "") -}}
+{{- $matched := dict -}}
+{{- if $name -}}
+  {{- range site.Params.seriesColors -}}
+    {{- if eq .name $name -}}
+      {{- $matched = dict "color" .color "soft" .soft "border" .border -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if not $matched -}}
+    {{- $palette := slice
+      (dict "color" "#4f46e5" "soft" "#eef2ff" "border" "#c7d2fe")
+      (dict "color" "#0d9488" "soft" "#f0fdfa" "border" "#99f6e4")
+      (dict "color" "#7c3aed" "soft" "#f5f3ff" "border" "#ddd6fe")
+      (dict "color" "#0284c7" "soft" "#f0f9ff" "border" "#bae6fd")
+      (dict "color" "#d97706" "soft" "#fffbeb" "border" "#fde68a")
+      (dict "color" "#e11d48" "soft" "#fff1f2" "border" "#fecdd3")
+    -}}
+    {{- $ch := substr (md5 $name) 0 1 -}}
+    {{- $idx := len (index (split "0123456789abcdef" $ch) 0) -}}
+    {{- $matched = index $palette (mod $idx (len $palette)) -}}
+  {{- end -}}
+{{- else -}}
+  {{- $matched = dict "color" "#4f46e5" "soft" "#eef2ff" "border" "#c7d2fe" -}}
+{{- end -}}
+{{- $attr := printf `style="--series-color:%s;--series-soft:%s;--series-border:%s;"` $matched.color $matched.soft $matched.border | safeHTMLAttr -}}
+{{- return (merge $matched (dict "styleAttr" $attr)) -}}

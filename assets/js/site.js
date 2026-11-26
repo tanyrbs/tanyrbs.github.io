@@ -56,4 +56,29 @@ if (tabsBox) {
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
   }
+
+  // 目录滚动高亮
+  const tocLinks = [...tabsBox.querySelectorAll(".sidebar-toc a[href^='#']")];
+  const tocItems = tocLinks
+    .map((link) => {
+      const raw = link.getAttribute("href").slice(1);
+      let el = document.getElementById(raw);
+      if (!el) {
+        try { el = document.getElementById(decodeURIComponent(raw)); } catch {}
+      }
+      return el ? { link, el } : null;
+    })
+    .filter(Boolean);
+
+  if (tocItems.length) {
+    const syncToc = () => {
+      let current = tocItems[0];
+      for (const item of tocItems) {
+        if (item.el.getBoundingClientRect().top <= 120) current = item;
+      }
+      tocItems.forEach((item) => item.link.classList.toggle("is-active", item === current));
+    };
+    syncToc();
+    window.addEventListener("scroll", syncToc, { passive: true });
+  }
 }

@@ -15,7 +15,8 @@
     {{ range $seriesOrder }}
       {{ $items := index $groups . }}
       {{ $items = sort $items "Params.lectureNumber" }}
-      <section class="notes-series">
+      {{ $pal := partial "series-palette.html" . }}
+      <section class="notes-series" {{ $pal.styleAttr }}>
         <h2>{{ if . }}{{ . }}{{ else }}{{ i18n "uncategorized" }}{{ end }}</h2>
         <ol>
           {{ range $items }}

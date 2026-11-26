@@ -5,7 +5,7 @@
   {{ $title := cond .IsHome site.Title (printf "%s | %s" .Title site.Title) }}
   <meta name="description" content="{{ $description }}">
   <meta name="author" content="{{ site.Params.author }}">
-  <meta name="theme-color" content="#111214">
+  <meta name="theme-color" content="#f7f9fc">
   <meta name="color-scheme" content="light">
   <link rel="canonical" href="{{ .Permalink }}">
   {{ with .OutputFormats.Get "RSS" }}

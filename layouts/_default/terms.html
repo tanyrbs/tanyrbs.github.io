@@ -4,7 +4,8 @@
   {{ if $isCategories }}
     <section class="category-grid" aria-label="{{ .Title }}">
       {{ range $catalog.categories }}
-        <article class="category-card">
+        {{ $pal := partial "series-palette.html" .page.LinkTitle }}
+        <article class="category-card" {{ $pal.styleAttr }}>
           <header class="category-card-heading">
             <h2><a href="{{ .page.RelPermalink }}">{{ .page.LinkTitle }}</a></h2>
             <span>{{ i18n "postCount" (len .posts) }}</span>

@@ -1,12 +1,67 @@
 {{ define "main" }}
   {{ $posts := where site.RegularPages "Section" "in" (slice "blog" "notes") }}
+
+  {{ with site.Params.homeIntro }}
+    <section class="home-intro" aria-label="{{ i18n "about" }}">
+      <p>{{ . }}</p>
+    </section>
+  {{ end }}
+
+  {{ $order := slice }}
+  {{ $groups := dict }}
+  {{ range $posts }}
+    {{ $key := .Params.lectureSeries | default "" }}
+    {{ if $key }}
+      {{ if not (in $order $key) }}{{ $order = $order | append $key }}{{ end }}
+      {{ $existing := index $groups $key | default slice }}
+      {{ $groups = merge $groups (dict $key ($existing | append .)) }}
+    {{ end }}
+  {{ end }}
+
+  {{ $preferred := site.Params.seriesOrder | default slice }}
+  {{ $series := slice }}
+  {{ range $preferred }}{{ if index $groups . }}{{ $series = $series | append . }}{{ end }}{{ end }}
+  {{ $rest := slice }}
+  {{ range $order }}{{ if not (in $series .) }}{{ $rest = $rest | append . }}{{ end }}{{ end }}
+  {{ $series = $series | append (sort $rest) }}
+
+  {{ with $series }}
+    <section class="series-strip" aria-label="{{ i18n "categories" }}">
+      {{ range . }}
+        {{ $name := . }}
+        {{ $items := index $groups $name }}
+        {{ $pal := partial "series-palette.html" $name }}
+        {{ $href := (site.GetPage "/articles").RelPermalink | default ("articles/" | relLangURL) }}
+        {{ range site.Taxonomies.categories }}
+          {{ if eq .Page.LinkTitle $name }}
+            {{ $href = .Page.RelPermalink }}
+          {{ end }}
+        {{ end }}
+        <a class="series-tile" href="{{ $href }}" {{ $pal.styleAttr }}>
+          <span class="series-tile-title">{{ $name }}</span>
+          <span class="series-tile-count">{{ i18n "postCount" (len $items) }}</span>
+        </a>
+      {{ end }}
+    </section>
+  {{ end }}
+
   <section class="post-list" aria-label="{{ i18n "articles" }}">
     {{ range first 8 ($posts.ByDate.Reverse) }}
-      <article class="post-card">
+      {{ $cardSeries := .Params.lectureSeries | default "" }}
+      {{ if not $cardSeries }}
+        {{ with (.GetTerms "categories") }}{{ $cardSeries = (index . 0).LinkTitle }}{{ end }}
+      {{ end }}
+      {{ $cardPal := partial "series-palette.html" $cardSeries }}
+      <article class="post-card" {{ $cardPal.styleAttr }}>
+        {{ $p := . }}
+        {{ with .Params.lectureSeries }}
+          <div class="post-card-kicker">
+            <span class="meta-pill category-pill">{{ . }}{{ with $p.Params.lectureNumber }} · 第 {{ . }} 讲{{ end }}</span>
+          </div>
+        {{ end }}
         <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
         {{ partial "post-meta.html" . }}
-        {{ $summary := .Summary | plainify }}
-        {{ if not $summary }}{{ $summary = .Description }}{{ end }}
+        {{ $summary := .Params.summary | default .Description | default (.Summary | plainify) }}
         {{ with $summary }}<p class="post-summary">{{ . }}</p>{{ end }}
         <div class="post-card-footer">
           <a class="read-more" href="{{ .RelPermalink }}">{{ i18n "readMore" }} <span aria-hidden="true">&rarr;</span></a>

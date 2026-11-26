@@ -1,19 +1,29 @@
 {{ define "main" }}
   {{ $isCategory := and (eq .Kind "term") (eq .Data.Plural "categories") }}
-  {{ $isNotes := eq .Section "notes" }}
   {{ $posts := .Pages.ByDate.Reverse }}
-  {{ if $isCategory }}{{ $posts = (where .Pages "Section" "blog").ByDate.Reverse }}{{ end }}
+  {{ if $isCategory }}
+    {{ $catPosts := where .Pages "Section" "in" (slice "blog" "notes") }}
+    {{ $hasNumber := false }}
+    {{ range $catPosts }}{{ if .Params.lectureNumber }}{{ $hasNumber = true }}{{ end }}{{ end }}
+    {{ if $hasNumber }}
+      {{ $posts = sort $catPosts "Params.lectureNumber" }}
+    {{ else }}
+      {{ $posts = $catPosts.ByDate.Reverse }}
+    {{ end }}
+  {{ end }}
 
   <section class="post-list" aria-label="{{ .Title }}">
     {{ range $posts }}
-      <article class="post-card">
+      {{ $cardSeries := .Params.lectureSeries | default "" }}
+      {{ if not $cardSeries }}
+        {{ with (.GetTerms "categories") }}{{ $cardSeries = (index . 0).LinkTitle }}{{ end }}
+      {{ end }}
+      {{ $cardPal := partial "series-palette.html" $cardSeries }}
+      <article class="post-card" {{ $cardPal.styleAttr }}>
         <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
         {{ partial "post-meta.html" . }}
-        {{ with .Params.summary }}
-          <p class="post-summary">{{ . }}</p>
-        {{ else }}
-          <p class="post-summary">{{ .Summary | plainify }}</p>
-        {{ end }}
+        {{ $summary := .Params.summary | default .Description | default (.Summary | plainify) }}
+        {{ with $summary }}<p class="post-summary">{{ . }}</p>{{ end }}
         <div class="post-card-footer">
           <a class="read-more" href="{{ .RelPermalink }}">{{ i18n "readMore" }} <span aria-hidden="true">&rarr;</span></a>
         </div>

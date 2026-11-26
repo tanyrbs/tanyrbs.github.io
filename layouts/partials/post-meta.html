@@ -6,7 +6,10 @@
   {{ $categoryNames := slice }}
   {{ range $categories }}{{ $categoryNames = $categoryNames | append .LinkTitle }}{{ end }}
   {{ with $categories }}
-    {{ range . }}<a class="meta-pill category-pill" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}
+    {{ range . }}
+      {{ $pal := partial "series-palette.html" .LinkTitle }}
+      <a class="meta-pill category-pill" href="{{ .RelPermalink }}" {{ $pal.styleAttr }}>{{ .LinkTitle }}</a>
+    {{ end }}
   {{ end }}
   {{ with .GetTerms "tags" }}
     {{ range . }}{{ if not (in $categoryNames .LinkTitle) }}<a class="meta-pill" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}{{ end }}
