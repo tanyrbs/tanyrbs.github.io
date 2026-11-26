@@ -2,14 +2,7 @@
   {{ $isCategory := and (eq .Kind "term") (eq .Data.Plural "categories") }}
   {{ $posts := .Pages.ByDate.Reverse }}
   {{ if $isCategory }}
-    {{ $catPosts := where .Pages "Section" "in" (slice "blog" "notes") }}
-    {{ $hasNumber := false }}
-    {{ range $catPosts }}{{ if .Params.lectureNumber }}{{ $hasNumber = true }}{{ end }}{{ end }}
-    {{ if $hasNumber }}
-      {{ $posts = sort $catPosts "Params.lectureNumber" }}
-    {{ else }}
-      {{ $posts = $catPosts.ByDate.Reverse }}
-    {{ end }}
+    {{ $posts = (where .Pages "Section" "in" (slice "blog" "notes")).ByDate.Reverse }}
   {{ end }}
 
   <section class="post-list" aria-label="{{ .Title }}">

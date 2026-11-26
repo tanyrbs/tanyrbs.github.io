@@ -297,10 +297,6 @@ button:focus-visible {
   color: var(--series-color);
 }
 
-.post-card-kicker {
-  margin-bottom: 8px;
-}
-
 .post-meta {
   display: flex;
   flex-wrap: wrap;
@@ -448,11 +444,6 @@ button:focus-visible {
   border-radius: 50%;
   background: var(--series-color);
   flex: none;
-}
-
-.rail-series-current {
-  color: var(--series-color);
-  font-weight: 600;
 }
 
 .rail-tags {
@@ -1029,7 +1020,8 @@ button:focus-visible {
   font-size: 13px;
   font-weight: 400;
 }
-.notes-series ol {
+.notes-series ol,
+.notes-series ul {
   margin: 0;
   padding-left: 1.3em;
   line-height: 1.9;

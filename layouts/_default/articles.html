@@ -18,11 +18,11 @@
 
   {{ range $series }}
     {{ $items := index $groups . }}
-    {{ $items = sort $items "Params.lectureNumber" }}
+    {{ $items = sort $items "Date" "desc" }}
     {{ $pal := partial "series-palette.html" . }}
     <section class="notes-series" {{ $pal.styleAttr }}>
       <h2>{{ . }}<span class="articles-count">{{ len $items }}</span></h2>
-      <ol>
+      <ul>
         {{ range $items }}
           <li>
             <a href="{{ .RelPermalink }}">{{ .Title }}</a>
@@ -30,14 +30,14 @@
             {{ with .Params.description }}<span class="notes-series-desc"> — {{ . }}</span>{{ end }}
           </li>
         {{ end }}
-      </ol>
+      </ul>
     </section>
   {{ end }}
 
   {{ with index $groups "" }}
     <section class="notes-series">
       <h2>{{ i18n "uncategorized" }}<span class="articles-count">{{ len . }}</span></h2>
-      <ol>
+      <ul>
         {{ range .ByDate.Reverse }}
           <li>
             <a href="{{ .RelPermalink }}">{{ .Title }}</a>
@@ -45,7 +45,7 @@
             {{ with .Params.description }}<span class="notes-series-desc"> — {{ . }}</span>{{ end }}
           </li>
         {{ end }}
-      </ol>
+      </ul>
     </section>
   {{ end }}
 {{ end }}

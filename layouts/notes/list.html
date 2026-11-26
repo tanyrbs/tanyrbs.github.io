@@ -14,18 +14,18 @@
   {{ if $notes }}
     {{ range $seriesOrder }}
       {{ $items := index $groups . }}
-      {{ $items = sort $items "Params.lectureNumber" }}
+      {{ $items = sort $items "Date" "desc" }}
       {{ $pal := partial "series-palette.html" . }}
       <section class="notes-series" {{ $pal.styleAttr }}>
         <h2>{{ if . }}{{ . }}{{ else }}{{ i18n "uncategorized" }}{{ end }}</h2>
-        <ol>
+        <ul>
           {{ range $items }}
             <li>
               <a href="{{ .RelPermalink }}">{{ .Title }}</a>
               {{ with .Params.description }}<span class="notes-series-desc"> — {{ . }}</span>{{ end }}
             </li>
           {{ end }}
-        </ol>
+        </ul>
       </section>
     {{ end }}
   {{ else }}

@@ -1,39 +1,17 @@
 {{ $posts := where site.RegularPages "Section" "in" (slice "blog" "notes") }}
-{{ $isArticleSeries := and (eq .Kind "page") (in (slice "blog" "notes") .Section) .Params.lectureSeries }}
-{{ if $isArticleSeries }}
-  {{ $series := .Params.lectureSeries }}
-  {{ $cur := .RelPermalink }}
-  {{ $seriesPosts := sort (where $posts "Params.lectureSeries" $series) "Params.lectureNumber" }}
-  <section class="rail-panel">
-    <h2>{{ $series }}</h2>
-    <ul class="rail-list">
-      {{ range $seriesPosts }}
-        <li>
-          {{ if eq .RelPermalink $cur }}
-            <span class="rail-series-current">{{ with .Params.lectureNumber }}第 {{ . }} 讲 · {{ end }}{{ .LinkTitle }}</span>
-          {{ else }}
-            <a href="{{ .RelPermalink }}">{{ with .Params.lectureNumber }}第 {{ . }} 讲 · {{ end }}{{ .LinkTitle }}</a>
-          {{ end }}
-          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.dateFormat | default "2006-01-02") }}</time>
-        </li>
-      {{ end }}
-    </ul>
-  </section>
-{{ else }}
-  <section class="rail-panel">
-    <h2>{{ i18n "latestPosts" }}</h2>
-    <ul class="rail-list">
-      {{ range first 5 ($posts.ByDate.Reverse) }}
-        <li>
-          <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
-          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.dateFormat | default "2006-01-02") }}</time>
-        </li>
-      {{ else }}
-        <li class="empty-state">{{ i18n "noPosts" }}</li>
-      {{ end }}
-    </ul>
-  </section>
-{{ end }}
+<section class="rail-panel">
+  <h2>{{ i18n "latestPosts" }}</h2>
+  <ul class="rail-list">
+    {{ range first 5 ($posts.ByDate.Reverse) }}
+      <li>
+        <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.dateFormat | default "2006-01-02") }}</time>
+      </li>
+    {{ else }}
+      <li class="empty-state">{{ i18n "noPosts" }}</li>
+    {{ end }}
+  </ul>
+</section>
 
 {{ with site.Taxonomies.categories.ByCount }}
   <section class="rail-panel">

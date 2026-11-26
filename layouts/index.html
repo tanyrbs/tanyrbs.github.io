@@ -53,12 +53,6 @@
       {{ end }}
       {{ $cardPal := partial "series-palette.html" $cardSeries }}
       <article class="post-card" {{ $cardPal.styleAttr }}>
-        {{ $p := . }}
-        {{ with .Params.lectureSeries }}
-          <div class="post-card-kicker">
-            <span class="meta-pill category-pill">{{ . }}{{ with $p.Params.lectureNumber }} · 第 {{ . }} 讲{{ end }}</span>
-          </div>
-        {{ end }}
         <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
         {{ partial "post-meta.html" . }}
         {{ $summary := .Params.summary | default .Description | default (.Summary | plainify) }}
